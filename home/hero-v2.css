@@ -1,0 +1,141 @@
+/* ============================================================
+   HERO V2 — « Démonstratif & animé » (21st.dev / Aceternity)
+   Couche ADDITIVE : sublime le hero existant sans toucher au JS,
+   aux IDs ni à page.css. Tout est scoppé sous .lt-hero.
+   Palette stricte (accent #7FB8E8 / bright / deep / glow) — zéro hex hors DS.
+   ============================================================ */
+
+/* — Aurora beam derrière le titre : conic-gradient lent et flou — */
+.lt-hero__titlewrap { position: relative; }
+.lt-hero__titlewrap::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 130%; aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  background: conic-gradient(from 0deg,
+    transparent 0deg,
+    var(--accent-glow-soft) 60deg,
+    var(--accent-glow) 130deg,
+    transparent 200deg,
+    var(--accent-glow-soft) 300deg,
+    transparent 360deg);
+  filter: blur(46px);
+  opacity: 0.55;
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(closest-side, #000 25%, transparent 72%);
+  mask-image: radial-gradient(closest-side, #000 25%, transparent 72%);
+  animation: heroAurora 18s linear infinite;
+  pointer-events: none;
+}
+@keyframes heroAurora { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* — Spotlight qui suit la souris : plus large, plus présent — */
+.lt-hero .lt-hero__spotlight {
+  background:
+    radial-gradient(circle 680px at var(--mx) var(--my), rgba(127,184,232,0.11), transparent 62%),
+    radial-gradient(circle 260px at var(--mx) var(--my), rgba(191,220,245,0.10), transparent 60%);
+}
+
+/* — Grille en perspective plus lumineuse (renforce le runway) — */
+.lt-hero .lt-runway__horizon {
+  box-shadow: 0 0 30px 3px var(--accent-glow), 0 0 80px 8px var(--accent-glow-soft);
+}
+.lt-hero .lt-runway__edge i {
+  box-shadow: 0 0 14px var(--accent-glow), 0 0 34px var(--accent-glow), 0 0 60px var(--accent-glow-soft);
+}
+
+/* — Meteors : les streaks deviennent des traînées nettes facon Aceternity — */
+.lt-hero .lt-streaks i {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-bright) 55%, #fff 80%, transparent);
+  box-shadow: 0 0 12px var(--accent-glow), 0 0 26px var(--accent-glow-soft);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+/* — Texte accent : shimmer métallique glacial animé — */
+.lt-hero .lt-accent-text {
+  background: linear-gradient(100deg,
+    var(--accent-deep) 0%, var(--accent) 30%, #FFFFFF 50%, var(--accent-bright) 70%, var(--accent-deep) 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation: heroShimmer 5.5s linear infinite;
+}
+@keyframes heroShimmer { to { background-position: -220% 0; } }
+
+/* — Chips : cartes « spotlight » à bordure lumineuse animée — */
+.lt-hero .lt-hero__chips { gap: 14px; }
+.lt-hero .lt-chip {
+  position: relative;
+  background: linear-gradient(180deg, rgba(22,27,36,0.92), rgba(11,14,19,0.92));
+  border-color: transparent;
+  backdrop-filter: blur(6px);
+  overflow: hidden;
+  transition: transform .5s var(--ease-out), box-shadow .5s var(--ease-out);
+}
+/* anneau dégradé qui tourne (technique mask xor) */
+.lt-hero .lt-chip::before {
+  content: "";
+  position: absolute; inset: 0;
+  padding: 1px; border-radius: inherit;
+  background: conic-gradient(from var(--a, 0deg),
+    var(--border-subtle) 0deg, var(--accent) 90deg, var(--accent-bright) 140deg,
+    var(--border-subtle) 220deg, var(--border-subtle) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .55; transition: opacity .5s var(--ease-out);
+  animation: heroChipRing 6s linear infinite;
+}
+@property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes heroChipRing { to { --a: 360deg; } }
+/* halo qui suit la souris à l'intérieur de la chip */
+.lt-hero .lt-chip::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(120px circle at var(--cx, 50%) var(--cy, 50%), var(--accent-glow-soft), transparent 70%);
+  opacity: 0; transition: opacity .4s var(--ease-out); pointer-events: none;
+}
+.lt-hero .lt-chip:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 44px rgba(0,0,0,.55), 0 0 0 1px var(--accent-glow-soft);
+}
+.lt-hero .lt-chip:hover::before { opacity: 1; }
+.lt-hero .lt-chip:hover::after { opacity: 1; }
+.lt-hero .lt-chip__ic { box-shadow: inset 0 0 0 1px var(--accent-glow-soft); }
+
+/* — CTA primaire : anneau lumineux animé + pulsation du halo — */
+.lt-hero .lt-hero__cta .lt-btn--primary {
+  position: relative;
+  isolation: isolate;
+  animation: heroCtaPulse 3.2s var(--ease-out) infinite;
+}
+.lt-hero .lt-hero__cta .lt-btn--primary::before {
+  content: "";
+  position: absolute; inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--a, 0deg), transparent, var(--accent-bright), #fff, var(--accent), transparent 60%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: heroChipRing 3.5s linear infinite;
+  z-index: -1;
+}
+@keyframes heroCtaPulse {
+  0%, 100% { box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 28px var(--accent-glow); }
+  50% { box-shadow: 0 0 0 1px var(--accent-glow), 0 10px 40px var(--accent-glow), 0 0 60px var(--accent-glow-soft); }
+}
+
+/* — Eyebrow : point live + fine ligne lumineuse — */
+.lt-hero .lt-hero__eyebrow .lt-dot { box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent-glow); }
+
+/* — Accessibilité mouvement — */
+@media (prefers-reduced-motion: reduce) {
+  .lt-hero__titlewrap::before,
+  .lt-hero .lt-accent-text,
+  .lt-hero .lt-chip::before,
+  .lt-hero .lt-hero__cta .lt-btn--primary,
+  .lt-hero .lt-hero__cta .lt-btn--primary::before { animation: none; }
+  .lt-hero .lt-accent-text { background-position: 0 0; }
+}
