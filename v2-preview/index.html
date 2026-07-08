@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Terminal — V2 (prototype)</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   LE TERMINAL — V2 PROTOTYPE  ·  Cinematic Luxury (charte assouplie)
+   Palette 100% conforme design-system.css
+   ============================================================ */
+:root{
+  --bg-void:#07090C; --bg-base:#0B0E13; --bg-surface:#10141B; --bg-elevated:#161B24;
+  --accent:#7FB8E8; --accent-deep:#5A9BD4; --accent-bright:#BFDCF5;
+  --accent-glow:rgba(127,184,232,.35); --accent-glow-soft:rgba(127,184,232,.12);
+  --text-title:#F2F4F7; --text-body:#C3CAD4; --text-muted:#7E8794;
+  --border:#3A414C; --border-subtle:#1C212A;
+  --bull:#4ADE9C; --bear:#F0647A; --neutral:#E8C268;
+  --bull-glow:rgba(74,222,156,.18); --bear-glow:rgba(240,100,122,.18);
+  --metal:linear-gradient(180deg,#FBFCFE 0%,#C9CFD8 18%,#8A929E 42%,#EEF2F7 52%,#9AA2AE 64%,#6E7682 88%,#B7BEC9 100%);
+  --font-display:'Anton','Arial Narrow',sans-serif;
+  --font-text:'Inter',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --container:1200px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  background:var(--bg-void); color:var(--text-body);
+  font-family:var(--font-text); line-height:1.6; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent-glow);color:#fff}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--font-mono);font-feature-settings:"tnum" 1,"lnum" 1}
+.wrap{max-width:var(--container);margin:0 auto;padding:0 24px}
+.eyebrow{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:500}
+
+/* ambient background */
+.bg-field{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg-field::before{content:"";position:absolute;inset:-2px;
+  background-image:linear-gradient(var(--border-subtle) 1px,transparent 1px),linear-gradient(90deg,var(--border-subtle) 1px,transparent 1px);
+  background-size:64px 64px;opacity:.35;mask-image:radial-gradient(120% 80% at 50% 0%,#000 30%,transparent 75%);animation:drift 60s linear infinite}
+@keyframes drift{to{background-position:0 640px}}
+.bg-glow{position:absolute;top:-260px;left:50%;transform:translateX(-50%);width:1100px;height:900px;
+  background:radial-gradient(closest-side,var(--accent-glow-soft),transparent 70%);filter:blur(20px)}
+
+/* ===== TICKER (nouveau — bandeau salle des marchés) ===== */
+.ticker{position:relative;z-index:20;border-bottom:1px solid var(--border-subtle);background:rgba(7,9,12,.7);backdrop-filter:blur(8px);overflow:hidden}
+.ticker__track{display:flex;gap:44px;white-space:nowrap;padding:8px 0;width:max-content;animation:tape 38s linear infinite;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.02em}
+.ticker:hover .ticker__track{animation-play-state:paused}
+@keyframes tape{to{transform:translateX(-50%)}}
+.tk{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted)}
+.tk b{color:var(--text-title);font-weight:600}
+.tk .up{color:var(--bull)} .tk .down{color:var(--bear)}
+.tk .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+/* ===== NAV (réinventée) ===== */
+.nav{position:sticky;top:0;z-index:30;background:rgba(7,9,12,.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--border-subtle)}
+.nav__in{display:flex;align-items:center;gap:28px;height:70px}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--font-display);font-size:1.15rem;letter-spacing:.04em;color:var(--text-title)}
+.brand__bk{color:var(--accent);font-family:var(--font-mono);font-weight:700}
+.brand__mark{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:
+  radial-gradient(circle at 30% 25%,var(--accent-glow),transparent 60%),var(--bg-elevated);
+  display:grid;place-items:center}
+.brand__mark svg{width:18px;height:18px}
+.nav__links{display:flex;align-items:center;gap:4px;margin-left:6px}
+.nav__link{font-size:.9rem;color:var(--text-body);padding:9px 13px;border-radius:6px;transition:.25s var(--ease);position:relative}
+.nav__link:hover{color:var(--text-title);background:var(--accent-glow-soft)}
+.nav__spacer{flex:1}
+.nav__actions{display:flex;align-items:center;gap:10px}
+.pill{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;color:var(--text-muted);border:1px solid var(--border-subtle);border-radius:6px;padding:7px 10px;cursor:pointer;transition:.25s var(--ease)}
+.pill:hover{color:var(--text-title);border-color:var(--border)}
+.btn{display:inline-flex;align-items:center;gap:9px;font-weight:600;font-size:.9rem;border-radius:6px;padding:11px 18px;transition:.3s var(--ease);cursor:pointer;border:1px solid transparent;white-space:nowrap}
+.btn svg{width:16px;height:16px}
+.btn--ghost{color:var(--text-title);border-color:var(--border)}
+.btn--ghost:hover{border-color:var(--accent);background:var(--accent-glow-soft)}
+.btn--primary{background:linear-gradient(180deg,var(--accent-bright),var(--accent));color:#0A0D12;box-shadow:0 8px 30px var(--accent-glow)}
+.btn--primary:hover{transform:translateY(-2px);box-shadow:0 14px 42px var(--accent-glow)}
+.nav__burger{display:none}
+
+/* ===== HERO ===== */
+.hero{position:relative;z-index:10;padding:88px 0 40px}
+.hero__grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero__eyebrow{display:inline-flex;align-items:center;gap:10px;margin-bottom:26px}
+.hero__eyebrow .live{width:7px;height:7px;border-radius:50%;background:var(--bull);box-shadow:0 0 10px var(--bull);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-family:var(--font-display);font-weight:400;line-height:.9;letter-spacing:.01em;
+  font-size:clamp(3.2rem,7.6vw,6.4rem);text-transform:uppercase;color:var(--text-title)}
+.hero h1 .metal{background:var(--metal);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 14px rgba(0,0,0,.5))}
+.hero h1 .accent{color:var(--accent)}
+.hero__sub{max-width:36ch;margin:26px 0 8px;font-size:1.14rem;color:var(--text-body)}
+.hero__cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.hero__legal{margin-top:22px;font-size:.78rem;color:var(--text-muted);max-width:44ch}
+.hero__strip{display:flex;gap:30px;margin-top:38px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat__n{font-family:var(--font-mono);font-weight:700;font-size:1.7rem;color:var(--text-title);line-height:1}
+.stat__l{font-size:.74rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.12em}
+
+/* terminal card (product shot) */
+.termcard{position:relative;border:1px solid var(--border);border-radius:12px;background:
+  linear-gradient(180deg,var(--bg-surface),var(--bg-base));box-shadow:0 40px 90px rgba(0,0,0,.6),0 0 0 1px var(--accent-glow-soft);
+  overflow:hidden}
+.termcard::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 60% at 80% 0%,var(--accent-glow-soft),transparent 55%);pointer-events:none}
+.termcard__bar{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted)}
+.termcard__bar .d{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.termcard__bar .d:nth-child(1){background:var(--bear)} .termcard__bar .d:nth-child(2){background:var(--neutral)} .termcard__bar .d:nth-child(3){background:var(--bull)}
+.termcard__bar span{margin-left:auto}
+.termcard__body{padding:22px}
+.tc__head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.tc__pair{font-family:var(--font-display);font-size:1.5rem;color:var(--text-title);letter-spacing:.02em}
+.tc__tf{font-family:var(--font-mono);font-size:.72rem;color:var(--text-muted)}
+.badge-bull{font-family:var(--font-mono);font-size:.72rem;font-weight:600;color:var(--bull);border:1px solid var(--bull);background:var(--bull-glow);border-radius:5px;padding:5px 9px;letter-spacing:.06em}
+.tc__mid{display:flex;align-items:center;gap:22px;margin:6px 0 18px}
+.ring{position:relative;width:120px;height:120px;flex-shrink:0}
+.ring svg{transform:rotate(-90deg)}
+.ring__v{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring__v b{font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--text-title);line-height:1}
+.ring__v small{font-family:var(--font-mono);font-size:.62rem;color:var(--text-muted);letter-spacing:.14em}
+.tc__spark{flex:1;height:74px;display:flex;align-items:flex-end;gap:3px}
+.tc__spark i{flex:1;background:linear-gradient(180deg,var(--accent),var(--accent-deep));border-radius:2px 2px 0 0;opacity:.8;animation:grow .9s var(--ease) backwards}
+@keyframes grow{from{transform:scaleY(0);opacity:0}}
+.tc__rows{display:grid;gap:9px}
+.tc__row{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.78rem;padding-bottom:8px;border-bottom:1px solid var(--border-subtle)}
+.tc__row span:first-child{color:var(--text-muted)} .tc__row span:last-child{color:var(--text-title)}
+.tc__row .g{color:var(--bull)} .tc__row .r{color:var(--bear)}
+
+/* ===== SECTION shell ===== */
+.section{position:relative;z-index:10;padding:96px 0}
+.section__head{max-width:640px;margin-bottom:52px}
+.section__head h2{font-family:var(--font-display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;
+  font-size:clamp(2.1rem,4.4vw,3.3rem);line-height:1;color:var(--text-title);margin:16px 0 14px}
+.section__head p{color:var(--text-body);font-size:1.05rem}
+
+/* ===== BENTO outils ===== */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);grid-auto-rows:190px;gap:16px}
+.cell{position:relative;border:1px solid var(--border-subtle);border-radius:12px;background:linear-gradient(180deg,var(--bg-surface),var(--bg-base));padding:22px;overflow:hidden;transition:.4s var(--ease);display:flex;flex-direction:column;justify-content:space-between}
+.cell::after{content:"";position:absolute;inset:0;border-radius:12px;background:radial-gradient(90% 70% at 100% 0%,var(--accent-glow-soft),transparent 60%);opacity:0;transition:.4s var(--ease);pointer-events:none}
+.cell:hover{border-color:var(--border);transform:translateY(-3px);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.cell:hover::after{opacity:1}
+.cell--wide{grid-column:span 4} .cell--mid{grid-column:span 3} .cell--sm{grid-column:span 2} .cell--tall{grid-row:span 2}
+.cell__ico{width:40px;height:40px;border-radius:9px;border:1px solid var(--border);background:var(--bg-elevated);display:grid;place-items:center;color:var(--accent)}
+.cell__ico svg{width:20px;height:20px}
+.cell h3{font-family:var(--font-text);font-weight:600;font-size:1.12rem;color:var(--text-title);margin-bottom:6px}
+.cell p{font-size:.9rem;color:var(--text-muted);max-width:34ch}
+.cell__tag{position:absolute;top:18px;right:18px;font-family:var(--font-mono);font-size:.64rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border-subtle);border-radius:5px;padding:4px 8px}
+.cell--feature{background:
+  radial-gradient(120% 100% at 100% 0%,var(--accent-glow-soft),transparent 55%),linear-gradient(180deg,var(--bg-surface),var(--bg-base))}
+.cell--feature .big{font-family:var(--font-mono);font-weight:700;font-size:2.6rem;color:var(--text-title);line-height:1}
+
+/* ===== MARKET band (signature) ===== */
+.band{position:relative;z-index:10;padding:80px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);
+  background:linear-gradient(180deg,var(--bg-base),var(--bg-void))}
+.band__quote{font-family:var(--font-display);text-transform:uppercase;font-size:clamp(2rem,5.5vw,4.2rem);line-height:.95;color:var(--text-title);text-align:center;letter-spacing:.01em}
+.band__quote em{font-style:normal;background:var(--metal);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.band__sub{text-align:center;color:var(--text-muted);font-family:var(--font-mono);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;margin-top:20px}
+
+/* ===== steps ===== */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{border:1px solid var(--border-subtle);border-radius:12px;padding:26px;background:var(--bg-surface);position:relative}
+.step__n{font-family:var(--font-mono);font-size:.8rem;color:var(--accent);letter-spacing:.14em}
+.step h4{font-family:var(--font-text);font-weight:600;color:var(--text-title);font-size:1.15rem;margin:12px 0 8px}
+.step p{font-size:.92rem;color:var(--text-muted)}
+
+/* ===== pricing teaser ===== */
+.price{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:stretch}
+.plan{border:1px solid var(--border-subtle);border-radius:12px;padding:28px;background:var(--bg-surface);display:flex;flex-direction:column;gap:14px}
+.plan--pro{border-color:var(--accent);background:linear-gradient(180deg,var(--bg-surface),var(--bg-base));box-shadow:0 0 0 1px var(--accent-glow-soft),0 30px 70px rgba(0,0,0,.45)}
+.plan__tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted)}
+.plan--pro .plan__tag{color:var(--accent)}
+.plan__price{font-family:var(--font-mono);font-weight:700;font-size:2.2rem;color:var(--text-title)}
+.plan__price small{font-size:.9rem;color:var(--text-muted);font-weight:400}
+.plan ul{list-style:none;display:grid;gap:9px;font-size:.9rem;color:var(--text-body);margin-top:4px}
+.plan li{display:flex;gap:9px;align-items:flex-start}
+.plan li svg{width:15px;height:15px;color:var(--bull);flex-shrink:0;margin-top:3px}
+
+/* ===== final CTA ===== */
+.final{position:relative;z-index:10;text-align:center;padding:110px 0}
+.final h2{font-family:var(--font-display);text-transform:uppercase;font-size:clamp(2.4rem,6vw,4.6rem);line-height:.95;color:var(--text-title)}
+.final h2 .accent{color:var(--accent)}
+.final p{max-width:46ch;margin:20px auto 34px;color:var(--text-body);font-size:1.1rem}
+
+/* ===== footer ===== */
+.foot{position:relative;z-index:10;border-top:1px solid var(--border-subtle);padding:44px 0;color:var(--text-muted);font-size:.85rem}
+.foot__in{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:center}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}*{animation:none!important}}
+
+/* responsive */
+@media(max-width:900px){
+  .hero__grid{grid-template-columns:minmax(0,1fr);gap:40px}
+  .termcard,.tc__mid,.tc__spark,.tc__rows,.hero__sub{min-width:0;max-width:100%}
+  .tc__spark{overflow:hidden}
+  .bento{grid-template-columns:repeat(2,1fr);grid-auto-rows:auto}
+  .cell{min-height:170px}
+  .cell--wide,.cell--mid,.cell--sm{grid-column:span 2} .cell--tall{grid-row:auto}
+  .steps,.price{grid-template-columns:1fr}
+  .nav__links{display:none}
+  .nav__burger{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--border);border-radius:8px;color:var(--text-title)}
+}
+@media(max-width:560px){
+  .wrap{padding:0 18px}
+  .hero{padding:52px 0 30px}
+  .hero h1{font-size:clamp(2rem,9vw,3.4rem);line-height:.94}
+  .hero__sub{font-size:1.02rem;max-width:100%}
+  .hero__cta{flex-direction:column}
+  .hero__cta .btn{width:100%;justify-content:center}
+  .hero__strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .stat{min-width:0}
+  .stat__n{font-size:1.25rem}
+  .stat__l{font-size:.62rem;letter-spacing:.06em;white-space:normal}
+  .bento{grid-template-columns:1fr}
+  .cell--wide,.cell--mid,.cell--sm{grid-column:span 1}
+  .cell--feature .big{font-size:2.1rem}
+  .nav__actions .pill,.nav__actions .btn--ghost{display:none}
+  .nav__actions .btn--primary{padding:9px 13px;font-size:.82rem}
+  .nav__burger{display:none}
+  .nav__in{gap:12px;height:64px}
+  .brand{font-size:1rem}
+  .tc__spark{min-width:0}
+  .section{padding:64px 0}
+}
+</style>
+</head>
+<body>
+<div class="bg-field"><div class="bg-glow"></div></div>
+
+<!-- ░ TICKER — bandeau salle des marchés (nouveau) ░ -->
+<div class="ticker">
+  <div class="ticker__track" id="tape"></div>
+</div>
+
+<!-- ░ NAV réinventée ░ -->
+<nav class="nav">
+  <div class="wrap nav__in">
+    <a class="brand" href="#top">
+      <span class="brand__mark"><svg viewBox="0 0 24 24" fill="none" stroke="#7FB8E8" stroke-width="1.6"><path d="M3 17l5-5 4 3 6-8"/><path d="M3 21h18"/></svg></span>
+      <span class="brand__bk">[</span>&nbsp;LE&nbsp;TERMINAL&nbsp;<span class="brand__bk">]</span>
+    </a>
+    <div class="nav__links">
+      <a class="nav__link" href="#outils">Outils</a>
+      <a class="nav__link" href="#methode">Méthode</a>
+      <a class="nav__link" href="#tarifs">Tarifs</a>
+      <a class="nav__link" href="#">Communauté</a>
+      <a class="nav__link" href="#">Avis</a>
+      <a class="nav__link" href="#">Blog</a>
+    </div>
+    <div class="nav__spacer"></div>
+    <div class="nav__actions">
+      <span class="pill">FR</span>
+      <a class="btn btn--ghost" href="#">Connexion</a>
+      <a class="btn btn--primary" href="#tarifs">Accès Premium <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <button class="nav__burger" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</nav>
+
+<!-- ░ HERO ░ -->
+<header class="hero" id="top">
+  <div class="wrap hero__grid">
+    <div>
+      <div class="hero__eyebrow"><span class="live"></span><span class="eyebrow">Salle des marchés · ouverte 24/7</span></div>
+      <h1><span class="metal">Votre salle</span><br><span class="metal">des marchés</span><br><span class="accent">privée.</span></h1>
+      <p class="hero__sub">Analysez vos setups à l'IA, tenez votre journal P&amp;L, suivez le calendrier éco et maîtrisez votre risque. Six outils, un seul cockpit.</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#tarifs">Ouvrir le terminal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn--ghost" href="#outils">Voir les outils</a>
+      </div>
+      <p class="hero__legal">Outils d'analyse et d'aide à la décision — pas un conseil en investissement. Le trading comporte un risque élevé de perte en capital.</p>
+      <div class="hero__strip">
+        <div class="stat"><span class="stat__n" data-count="6">6</span><span class="stat__l">Outils intégrés</span></div>
+        <div class="stat"><span class="stat__n" data-count="24" data-suffix="/7">24/7</span><span class="stat__l">Marchés suivis</span></div>
+        <div class="stat"><span class="stat__n" data-count="100" data-suffix=" /100">100 /100</span><span class="stat__l">Score IA de setup</span></div>
+      </div>
+    </div>
+
+    <!-- product shot : Setup Analyzer -->
+    <div class="rv in">
+      <div class="termcard">
+        <div class="termcard__bar"><i class="d"></i><i class="d"></i><i class="d"></i>&nbsp;setup-analyzer.exe <span>IA · temps réel</span></div>
+        <div class="termcard__body">
+          <div class="tc__head">
+            <div><div class="tc__pair">XAU / USD</div><div class="tc__tf">H1 · analyse de setup</div></div>
+            <div class="badge-bull">▲ HAUSSIER</div>
+          </div>
+          <div class="tc__mid">
+            <div class="ring">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" fill="none" stroke="#1C212A" stroke-width="9"/>
+                <circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="#4ADE9C" stroke-width="9" stroke-linecap="round"
+                  stroke-dasharray="326.7" stroke-dashoffset="42.5"/>
+              </svg>
+              <div class="ring__v"><b id="ringNum">87</b><small>/ 100</small></div>
+            </div>
+            <div class="tc__spark" id="spark"></div>
+          </div>
+          <div class="tc__rows">
+            <div class="tc__row"><span>Ratio risque / gain</span><span class="g">1 : 3.2</span></div>
+            <div class="tc__row"><span>Structure de marché</span><span>Tendance ↑ confirmée</span></div>
+            <div class="tc__row"><span>Zone d'invalidation</span><span class="r">1 987,40</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ░ OUTILS — bento ░ -->
+<section class="section" id="outils">
+  <div class="wrap">
+    <div class="section__head rv">
+      <span class="eyebrow">Le cockpit</span>
+      <h2>Six outils.<br>Un seul écran.</h2>
+      <p>Tout ce qu'il vous faut pour décider, exécuter et progresser — réuni, cohérent, sans quitter Le Terminal.</p>
+    </div>
+    <div class="bento">
+      <div class="cell cell--wide cell--tall cell--feature rv">
+        <div class="cell__tag">Produit phare</div>
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 4-6"/></svg></div>
+        <div>
+          <span class="big mono">/100</span>
+          <h3 style="margin-top:8px">Setup Analyzer IA</h3>
+          <p>Déposez le graphique d'un setup, l'IA le note sur 100 et détaille forces, faiblesses et invalidation.</p>
+        </div>
+      </div>
+      <div class="cell cell--sm rv">
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></div>
+        <div><h3>Journal de Trading</h3><p>Calendrier, P&amp;L, coach IA.</p></div>
+      </div>
+      <div class="cell cell--sm rv">
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div><h3>Calendrier Éco</h3><p>NFP · CPI · FOMC en direct.</p></div>
+      </div>
+      <div class="cell cell--sm rv">
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg></div>
+        <div><h3>Patrimoine</h3><p>Portefeuille long terme.</p></div>
+      </div>
+      <div class="cell cell--sm rv">
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/></svg></div>
+        <div><h3>Bubble Map</h3><p>Corrélations en un coup d'œil.</p></div>
+      </div>
+      <div class="cell cell--sm rv">
+        <div class="cell__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h10"/></svg></div>
+        <div><h3>Calculateur de pips</h3><p>Position, risque, valeur du pip.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░ BAND signature ░ -->
+<div class="band">
+  <div class="wrap rv">
+    <div class="band__quote">Le marché ne dort <em>jamais.</em></div>
+    <div class="band__sub">— et votre cockpit non plus —</div>
+  </div>
+</div>
+
+<!-- ░ MÉTHODE ░ -->
+<section class="section" id="methode">
+  <div class="wrap">
+    <div class="section__head rv">
+      <span class="eyebrow">La méthode</span>
+      <h2>Décider en trois temps.</h2>
+    </div>
+    <div class="steps">
+      <div class="step rv"><div class="step__n">01 — ANALYSER</div><h4>Notez le setup</h4><p>L'IA évalue votre graphique et pose un score objectif, sans complaisance.</p></div>
+      <div class="step rv"><div class="step__n">02 — EXÉCUTER</div><h4>Gérez le risque</h4><p>Taille de position, ratio, invalidation : chaque trade est cadré avant l'entrée.</p></div>
+      <div class="step rv"><div class="step__n">03 — PROGRESSER</div><h4>Tenez le journal</h4><p>Chaque trade documenté, relu et coaché par l'IA pour corriger la trajectoire.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ░ TARIFS teaser ░ -->
+<section class="section" id="tarifs">
+  <div class="wrap">
+    <div class="section__head rv">
+      <span class="eyebrow">Accès</span>
+      <h2>Un abonnement.<br>Tout le terminal.</h2>
+    </div>
+    <div class="price">
+      <div class="plan rv">
+        <span class="plan__tag">Découverte</span>
+        <div class="plan__price">0 €<small> / toujours</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Analyses de setup limitées</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Calculateur &amp; bubble map</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Mur des trades</li>
+        </ul>
+        <a class="btn btn--ghost" href="#" style="margin-top:auto">Commencer</a>
+      </div>
+      <div class="plan plan--pro rv">
+        <span class="plan__tag">Premium mensuel · le plus choisi</span>
+        <div class="plan__price">29,99 €<small> / mois</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Les 6 outils, sans limite</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Journal + coach IA complet</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Actu éco Premium</li>
+        </ul>
+        <a class="btn btn--primary" href="#" style="margin-top:auto;justify-content:center">Passer Premium</a>
+      </div>
+      <div class="plan rv">
+        <span class="plan__tag">Premium annuel</span>
+        <div class="plan__price">19,99 €<small> / mois</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Tout le Premium</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Deux mois offerts</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>Facturation annuelle</li>
+        </ul>
+        <a class="btn btn--ghost" href="#" style="margin-top:auto">Économiser 33 %</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ░ FINAL CTA ░ -->
+<section class="final">
+  <div class="wrap rv">
+    <span class="eyebrow">Prêt ?</span>
+    <h2>Prenez place<br>dans <span class="accent">Le Terminal.</span></h2>
+    <p>Le cockpit du trader autonome vous attend. Froid, précis, à vos ordres.</p>
+    <a class="btn btn--primary" href="#tarifs" style="padding:15px 26px;font-size:1rem">Ouvrir mon terminal <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="brand" style="font-size:1rem"><span class="brand__bk">[</span>&nbsp;LE&nbsp;TERMINAL&nbsp;<span class="brand__bk">]</span></div>
+    <div>© 2026 Le Terminal — prototype V2. Fondé par Adrien &amp; Romain.</div>
+  </div>
+</footer>
+
+<script>
+/* ticker data */
+(function(){
+  const rows=[
+    ['EUR/USD','1.0842','+0.21%','up'],['XAU/USD','2 014,60','+0.68%','up'],['BTC/USD','67 420','-1.12%','down'],
+    ['NAS100','19 884','+0.44%','up'],['GBP/JPY','197,84','-0.30%','down'],['SP500','5 246','+0.19%','up'],
+    ['ETH/USD','3 512','+2.04%','up'],['USD/JPY','151,22','+0.08%','up'],['CAC40','8 012','-0.22%','down']
+  ];
+  const one=rows.map(r=>`<span class="tk"><span class="dot"></span><b>${r[0]}</b> <span class="mono">${r[1]}</span> <span class="${r[3]}">${r[3]==='up'?'▲':'▼'} ${r[2]}</span></span>`).join('');
+  document.getElementById('tape').innerHTML=one+one;
+})();
+
+/* sparkline bars */
+(function(){
+  const s=document.getElementById('spark');if(!s)return;
+  const h=[30,42,38,55,48,66,60,74,70,88,82,96];
+  s.innerHTML=h.map((v,i)=>`<i style="height:${v}%;animation-delay:${i*.05}s"></i>`).join('');
+})();
+
+const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches||location.search.indexOf('static')>-1;
+
+/* reveal on scroll */
+(function(){
+  const els=[...document.querySelectorAll('.rv')];
+  if(reduce||!('IntersectionObserver'in window)){els.forEach(e=>e.classList.add('in'));return;}
+  const io=new IntersectionObserver((en)=>{en.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.15});
+  els.forEach(e=>io.observe(e));
+})();
+
+/* count-up + ring (fire once visible) */
+function animateCount(el){
+  const target=parseFloat(el.dataset.count),suf=el.dataset.suffix||'';const dur=1200;let t0=null;
+  if(reduce){el.textContent=target+suf;return;}
+  function step(ts){if(!t0)t0=ts;const p=Math.min((ts-t0)/dur,1);const e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(target*e)+suf;if(p<1)requestAnimationFrame(step);}
+  requestAnimationFrame(step);
+}
+(function(){
+  const ring=document.getElementById('ringArc'),num=document.getElementById('ringNum');
+  const score=87,circ=326.7;
+  function fireRing(){
+    if(reduce){ring.style.strokeDashoffset=circ*(1-score/100);num.textContent=score;return;}
+    ring.style.transition='stroke-dashoffset 1.4s cubic-bezier(.16,1,.3,1)';
+    requestAnimationFrame(()=>ring.style.strokeDashoffset=circ*(1-score/100));
+    let t0=null;function s(ts){if(!t0)t0=ts;const p=Math.min((ts-t0)/1400,1);num.textContent=Math.round(score*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(s);}requestAnimationFrame(s);
+  }
+  const stats=[...document.querySelectorAll('.stat__n')];
+  const io=new IntersectionObserver((en)=>{en.forEach(e=>{if(e.isIntersecting){
+    if(e.target.classList.contains('stat__n'))animateCount(e.target);
+    io.unobserve(e.target);}})},{threshold:.6});
+  stats.forEach(s=>io.observe(s));
+  // ring visible on load (hero)
+  setTimeout(fireRing,450);
+})();
+
+/* nav condense */
+addEventListener('scroll',()=>{document.querySelector('.nav').style.height=scrollY>40?'':'';},{passive:true});
+</script>
+</body>
+</html>
