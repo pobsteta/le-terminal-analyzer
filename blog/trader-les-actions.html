@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script>try{if(localStorage.getItem('lt_theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trader les actions : ce qui les distingue | Le Terminal</title>
+<meta name="description" content="Propriété, dividendes, résultats trimestriels, liquidité selon la taille : ce qui sépare une action d'un indice ou d'une devise, et ce que ça change.">
+<link rel="canonical" href="https://www.leterminal.net/blog/trader-les-actions">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Le Terminal">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Trader les actions : ce qui les distingue | Le Terminal">
+<meta property="og:description" content="Propriété, dividendes, résultats trimestriels, liquidité selon la taille : ce qui sépare une action d'un indice ou d'une devise, et ce que ça change.">
+<meta property="og:url" content="https://www.leterminal.net/blog/trader-les-actions">
+<meta property="og:image" content="https://www.leterminal.net/blog/img/trader-les-actions-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ce qui distingue une action des autres instruments : propriété d'une part d'entreprise, dividendes, résultats trimestriels et liquidité variable — Le Terminal">
+<meta property="article:published_time" content="2026-08-24">
+<meta property="article:modified_time" content="2026-08-24">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Trader les actions : ce qui les distingue">
+<meta name="twitter:description" content="Une action a quelque chose qu'aucun autre instruments n'a : une entreprise derrière. Tout part de là.">
+<meta name="twitter:image" content="https://www.leterminal.net/blog/img/trader-les-actions-og.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Trader les actions : ce qui les distingue des autres marchés",
+      "description": "Ce qui sépare une action d'un indice, d'une devise ou d'une matière première : propriété d'une part d'entreprise, dividendes et détachement, périodes de résultats, liquidité selon la capitalisation, horaires et gaps, opérations sur titres, et erreurs propres à cette classe d'actifs.",
+      "datePublished": "2026-08-24",
+      "dateModified": "2026-08-24",
+      "inLanguage": "fr-FR",
+      "author": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/",
+        "logo": { "@type": "ImageObject", "url": "https://www.leterminal.net/logo.png" }
+      },
+      "image": "https://www.leterminal.net/blog/img/trader-les-actions-og.jpg",
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.leterminal.net/blog/trader-les-actions" },
+      "keywords": "trader les actions, dividende, détachement, résultats trimestriels, capitalisation, liquidité, opérations sur titres"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qui distingue une action des autres instruments ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Une action représente une part du capital d'une entreprise, ce qui n'a aucun équivalent parmi les devises, les indices ou les métaux. Il en découle trois particularités : elle peut verser un revenu sous forme de dividende, sa valeur dépend de résultats publiés à dates connues, et son émetteur peut faire défaut. Aucune autre classe d'actifs ne réunit ces trois caractéristiques."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Que se passe-t-il le jour du détachement du dividende ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Le cours est ajusté à la baisse d'un montant correspondant au dividende versé, puisque la trésorerie correspondante quitte l'entreprise. Cette baisse n'est donc pas un mouvement de marché : c'est un ajustement comptable. La méconnaître conduit à interpréter comme un signal baissier ce qui n'est qu'une écriture, et à déclencher des stops pour de mauvaises raisons."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Faut-il conserver une position pendant les résultats trimestriels ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Conserver une position sur une publication de résultats revient à accepter un risque distinct de l'analyse technique : le cours peut ouvrir très loin du dernier prix, au-delà du niveau de stop prévu. Beaucoup d'intervenants ferment donc leurs positions avant la publication, non par prudence de principe mais parce que la perte potentielle n'est plus bornée par le stop."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Pourquoi la liquidité varie-t-elle autant d'une action à l'autre ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Elle dépend directement du nombre de participants qui suivent le titre, lui-même lié à la taille de l'entreprise et à sa présence dans les grands indices. Une valeur très échangée présente des écarts serrés et absorbe des ordres importants ; une petite capitalisation peut voir son cours se déplacer sensiblement pour un volume modeste, et son carnet se vider rapidement."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Vaut-il mieux trader une action ou un indice ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Une action isolée réagit à sa propre actualité en plus du contexte général, ce qui ajoute une source de mouvement imprévisible et non technique. Un indice, agrégeant de nombreuses valeurs, lisse ces événements individuels. Le choix dépend donc de ce que l'on souhaite assumer : le risque propre à une entreprise, ou seulement celui du marché dans son ensemble."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Peut-on vendre à découvert une action ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La vente à découvert est possible sur certaines valeurs, mais elle suppose d'emprunter les titres, ce qui a un coût et n'est pas toujours disponible. Des restrictions temporaires peuvent également être imposées par les autorités sur certains titres. Les produits dérivés permettent de se positionner à la baisse plus simplement, au prix des caractéristiques propres à ces instruments."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.leterminal.net/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.leterminal.net/blog" },
+        { "@type": "ListItem", "position": 3, "name": "Trader les actions", "item": "https://www.leterminal.net/blog/trader-les-actions" }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/anton-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="/design-system.css">
+<link rel="stylesheet" href="/theme-light.css">
+<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+<a id="top"></a>
+<div class="lt-progress" aria-hidden="true"><span class="lt-progress__fill"></span></div>
+
+<!-- CHROME -->
+<div class="lt-chrome" id="ltChrome">
+  <header class="lt-nav">
+    <a class="lt-nav__brand" href="/">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </a>
+    <nav class="lt-nav__links">
+      <div class="lt-nav__drop" id="ltDrop">
+        <button class="lt-nav__droptrigger" aria-expanded="false" data-en="Tools <span class='lt-nav__caret'><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg></span>">
+          Outils <span class="lt-nav__caret"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="lt-nav__menu">
+          <a class="lt-nav__menuitem" href="/"><span class="lt-nav__menutop"><span class="lt-nav__menulabel" data-en="Home">Accueil</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Overview">Vue d'ensemble</span></a>
+          <a class="lt-nav__menuitem" href="/journal-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Journal de Trading</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Calendar · P&amp;L · AI coach">Calendrier · P&amp;L · IA coach</span></a>
+          <a class="lt-nav__menuitem" href="/analyzer-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Setup Analyzer</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="AI score for your setup">Score IA de votre setup</span></a>
+          <a class="lt-nav__menuitem" href="/patrimoine-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Patrimoine</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Long-term portfolio">Portefeuille long terme</span></a>
+          <a class="lt-nav__menuitem" href="/calendrier-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calendrier Éco</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc">NFP · CPI · FOMC</span></a>
+          <a class="lt-nav__menuitem" href="/bubble"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Bubble Map</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Live capital flows">Flux de capitaux en direct</span></a>
+          <a class="lt-nav__menuitem" href="/calculateur"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calculateur de Pips</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Position · risk · R:R">Position · risque · R:R</span></a>
+          <a class="lt-nav__menuitem" href="/mur-des-trades"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Mur des Trades</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Community-shared trades">Trades partagés par la communauté</span></a>
+        </div>
+      </div>
+      <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      <a href="/#method" data-en="Method">Méthode</a>
+      <a href="/#community" data-en="Community">Communauté</a>
+      <a href="/avis" data-en="Reviews">Avis</a>
+      <a href="/blog">Blog</a>
+    </nav>
+    <div class="lt-nav__actions">
+      <span class="lt-nav__pill" id="ltLangPill" title="Changer de langue">FR</span>
+      <button class="lt-btn lt-btn--ghost lt-btn--sm" id="loginBtn" onclick="window.ltOpenLogin?ltOpenLogin():void(0)" data-en="Sign in">Connexion</button>
+      <div id="ltUserBar"></div>
+      <a class="lt-btn lt-btn--primary lt-btn--sm lt-nav__cta" href="/tarifs"><svg class="lt-nav__cta-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l4.5 3.5L12 5l3.5 6.5L20 8l-1.6 9.5H5.6z"/></svg><span class="lt-nav__cta-txt" data-en="Premium Access">Accès Premium</span></a>
+    </div>
+  </header>
+</div>
+
+<main class="bl-wrap">
+<article class="bl-art">
+  <nav class="bl-crumb" aria-label="Fil d'Ariane">
+    <a href="/" data-en="Home">Accueil</a><span class="sep">→</span><a href="/blog">Blog</a><span class="sep">→</span><span class="cur">Trader les actions</span>
+  </nav>
+
+  <span class="lt-eyebrow"><span class="lt-dot"></span> Marché</span>
+  <h1 class="bl-art__title">Trader les actions : ce qui les distingue des autres marchés</h1>
+  <div class="bl-art__meta">
+    <span data-en="By the founders of Le Terminal">Par les fondateurs du Terminal</span>
+    <span>·</span>
+    <span data-en="Published August 24, 2026">Publié le 24 août 2026</span>
+    <span>·</span>
+    <span data-en="12 min read">12 min de lecture</span>
+  </div>
+
+  <figure class="bl-art__hero">
+    <img src="/blog/img/trader-les-actions.webp" width="1600" height="900" alt="Ce qui distingue une action des autres instruments : une part d'entreprise réelle, des dividendes détachés à date connue, des résultats publiés périodiquement et une liquidité qui varie selon la taille de la société" fetchpriority="high">
+  </figure>
+
+  <div class="bl-lead">
+    <p><strong>En bref.</strong> Une action possède quelque chose qu'aucun autre instrument n'a : <strong>une entreprise derrière</strong>. Elle peut verser un revenu, elle publie ses comptes à dates connues, et son émetteur peut faire défaut. Ces trois faits expliquent tout ce qui suit — le décrochage du cours le jour du détachement, les gaps de résultats qui traversent vos stops, et l'écart de liquidité considérable d'une valeur à l'autre.</p>
+  </div>
+
+  <div class="bl-prose">
+    <p>Voici la cinquième et dernière famille d'instruments de cette série, après les <a href="/blog/paires-de-devises">paires de devises</a>, les <a href="/blog/trader-les-indices">indices</a>, <a href="/blog/trader-l-or">l'or</a> et les <a href="/blog/trader-les-cryptomonnaies">cryptomonnaies</a>.</p>
+    <p>Et c'est la plus atypique. Sur les quatre autres, vous pariez sur un rapport, un panier, un métal ou un réseau. Ici, vous détenez — ou vous suivez — <strong>une entreprise réelle</strong>, avec des salariés, un chiffre d'affaires et des dettes. Cela change la nature même de ce qui fait bouger le prix.</p>
+
+    <h2>Ce que vous détenez réellement</h2>
+    <p>Une action est une part du capital d'une société. En l'achetant <em>en direct</em>, vous devenez actionnaire : vous avez un droit de vote en assemblée et un droit sur les bénéfices distribués.</p>
+    <p>Précision qui a son importance, et que beaucoup découvrent tard : cela n'est vrai que <strong>si vous détenez le titre</strong>. En passant par un produit dérivé, vous ne possédez rien — vous détenez un contrat qui réplique la variation du cours, avec les conséquences détaillées dans notre article sur <a href="/blog/qu-est-ce-qu-un-cfd">ce qu'est réellement un CFD</a> : pas de droit de vote, frais de portage quotidiens, et risque de contrepartie.</p>
+    <div class="bl-note">
+      <p><strong>Trois propriétés sans équivalent ailleurs</strong><br>
+      <strong>Elle peut verser un revenu</strong> — une devise n'en verse pas, un métal non plus<br>
+      <strong>Elle publie ses comptes</strong> — à dates connues d'avance, plusieurs fois par an<br>
+      <strong>Elle peut disparaître</strong> — une entreprise fait faillite ; une devise majeure, non</p>
+    </div>
+
+    <h2>Le dividende, et le piège du détachement</h2>
+    <p>Une société peut distribuer une part de ses bénéfices à ses actionnaires. C'est un attrait réel de cette classe d'actifs — et la source d'une des erreurs de lecture les plus fréquentes.</p>
+    <p>Le jour du <strong>détachement</strong>, le cours est ajusté à la baisse d'un montant correspondant au dividende versé. La logique est comptable : la trésorerie correspondante quitte l'entreprise, donc l'action vaut mécaniquement moins.</p>
+    <p><strong>Ce n'est pas un mouvement de marché.</strong> Personne n'a vendu, aucune information n'est sortie. Interpréter ce décrochage comme un signal baissier — ou le laisser déclencher un stop sans le savoir — revient à réagir à une écriture.</p>
+    <p>Deux conséquences pratiques : les dates de détachement sont publiées à l'avance et méritent d'être notées ; et si vous êtes exposé via un dérivé, le traitement de cet ajustement dépend des conditions de votre intermédiaire, y compris à la vente où il joue en sens inverse.</p>
+
+    <h2>Les résultats : le risque que le stop ne couvre pas</h2>
+    <p>C'est la spécificité la plus lourde de conséquences pour un trader, et elle n'a pas d'équivalent sur les devises.</p>
+    <p>Une entreprise publie ses comptes plusieurs fois par an, presque toujours <strong>en dehors des heures de cotation</strong>. Le lendemain, le titre ouvre en intégrant l'information d'un seul coup — parfois très loin du dernier prix.</p>
+    <div class="bl-note">
+      <p><strong>Ce que ça implique.</strong> Un stop situé à l'intérieur de ce gap n'est pas exécuté à son niveau : il devient un ordre au marché et part au premier prix disponible. Conserver une position sur une publication, c'est donc accepter une perte potentielle <strong>non bornée par votre stop</strong> — le mécanisme expliqué dans <a href="/blog/carnet-d-ordres">le carnet d'ordres</a>.</p>
+    </div>
+    <p>D'où une pratique répandue : fermer les positions avant la publication. Ce n'est pas de la timidité, c'est un calcul. Si vous choisissez de rester exposé, la seule réponse cohérente est de <strong>réduire la taille</strong> en conséquence, puisque la distance de stop ne représente plus votre risque maximal.</p>
+    <p>Autre point à connaître : pendant les semaines de publications, l'ensemble du marché devient plus sensible aux résultats d'entreprises qu'aux données macroéconomiques. Une méthode calibrée hors de ces périodes s'y comporte différemment.</p>
+
+    <h2>La liquidité change tout, d'une valeur à l'autre</h2>
+    <p>Sur les devises majeures, la liquidité est abondante et relativement stable. Sur les actions, elle varie dans des proportions considérables.</p>
+    <p>Elle dépend du nombre de participants qui suivent le titre — donc, en pratique, de la taille de l'entreprise et de sa présence dans les grands indices.</p>
+    <ul>
+      <li><strong>Les grandes capitalisations</strong> — nombreuses contreparties, écarts serrés, carnet profond. Elles absorbent des ordres importants sans bouger.</li>
+      <li><strong>Les capitalisations moyennes</strong> — liquidité correcte aux heures actives, nettement moindre en dehors.</li>
+      <li><strong>Les petites capitalisations</strong> — écarts larges, carnet mince. Le cours peut se déplacer sensiblement pour un volume modeste, et la sortie devient difficile au pire moment.</li>
+    </ul>
+    <p>La conséquence est directe : <strong>la même méthode ne se transpose pas d'une catégorie à l'autre</strong>. Un objectif de quelques dixièmes de pourcent est envisageable sur une valeur très échangée ; sur une petite capitalisation, l'écart d'achat-vente peut à lui seul consommer l'essentiel de cet objectif.</p>
+
+    <h2>Ce qui fait bouger une action</h2>
+    <p>Contrairement à un indice, qui ne réagit qu'à ce qui concerne toutes ses composantes, une action cumule <strong>deux sources de mouvement</strong>.</p>
+    <ul>
+      <li><strong>Le contexte général</strong> — politique monétaire, appétit pour le risque, orientation du marché dans son ensemble. C'est ce qui fait bouger les indices, et cela s'applique aussi à chaque titre.</li>
+      <li><strong>L'actualité propre à l'entreprise</strong> — résultats, changement de direction, contrat majeur, difficulté opérationnelle, décision réglementaire la concernant.</li>
+    </ul>
+    <p>Cette seconde source est <strong>imprévisible et non technique</strong>. Aucune lecture graphique n'anticipe une annonce d'entreprise. C'est le prix à payer pour la possibilité d'un mouvement propre, indépendant du marché.</p>
+    <p>S'y ajoute un effet de groupe : les valeurs d'un même secteur bougent souvent ensemble, parce qu'elles dépendent des mêmes déterminants. Détenir cinq titres d'un même secteur ne répartit donc pas le risque — c'est le mécanisme décrit dans notre article sur <a href="/blog/diversification-portefeuille">la diversification</a>.</p>
+
+    <h2>Les horaires et les opérations sur titres</h2>
+    <p>Deux points pratiques, brefs mais qui produisent des surprises.</p>
+
+    <h3>La séance, et ses deux plages utiles</h3>
+    <p>Comme pour les indices, un marché actions ouvre et ferme. L'activité se concentre à l'ouverture — où la nuit s'intègre d'un coup — et à la clôture. Le milieu de séance est nettement plus calme, et le recouvrement avec les places américaines constitue le second temps fort sur les valeurs européennes. Le rythme détaillé figure dans <a href="/blog/trader-les-indices">trader les indices</a>.</p>
+
+    <h3>Les opérations sur titres</h3>
+    <p>Une société peut diviser son action, la regrouper, procéder à une augmentation de capital ou à une distribution exceptionnelle. Ces opérations modifient mécaniquement le cours et, avec lui, l'historique du graphique.</p>
+    <p>Conséquence concrète pour qui fait de l'analyse technique : selon que votre graphique est <em>ajusté</em> ou non de ces opérations, les niveaux historiques ne sont pas les mêmes. Un support tracé sur un historique non ajusté peut correspondre à un prix qui n'a jamais existé dans les termes actuels.</p>
+
+    <h2>Les erreurs propres aux actions</h2>
+
+    <h3>Confondre bonne entreprise et bon trade</h3>
+    <p>Une société solide peut voir son cours baisser pendant des mois, et une société médiocre progresser. La qualité de l'entreprise et l'évolution de son cours à court terme sont deux questions distinctes. Le confondre conduit à conserver une position perdante par conviction — le mécanisme le plus coûteux décrit dans nos <a href="/blog/erreurs-psychologie-trading">erreurs de psychologie</a>.</p>
+
+    <h3>Traverser une publication sans le savoir</h3>
+    <p>Le calendrier des résultats est public. Ne pas le vérifier avant d'ouvrir une position revient à accepter un risque qu'on ignore. C'est le pendant, à l'échelle de l'entreprise, du <a href="/blog/calendrier-economique-trading">calendrier économique</a>.</p>
+
+    <h3>Appliquer une taille de position héritée d'ailleurs</h3>
+    <p>L'amplitude d'une action varie énormément selon la valeur, bien plus qu'entre deux paires de devises majeures. La taille se recalcule pour chaque titre, à partir de sa volatilité propre — ce que fait le <a href="/calculateur">calculateur du Terminal</a> à partir de votre distance de stop.</p>
+
+    <h3>Négliger l'écart sur les petites valeurs</h3>
+    <p>Sur un titre peu échangé, l'écart d'achat-vente peut représenter une part importante de l'objectif visé. Le coût par opération doit être chiffré <em>avant</em>, comme le montrent nos <a href="/blog/couts-du-trading">chiffres sur le coût réel du trading</a>.</p>
+
+    <h2>Ce qu'il faut vérifier avant d'ouvrir une position</h2>
+    <div class="bl-note">
+      <p><strong>La date de la prochaine publication de résultats</strong> — et celle du prochain détachement de dividende<br>
+      <strong>L'écart moyen d'achat-vente</strong> sur ce titre, converti en pourcentage de votre objectif<br>
+      <strong>L'amplitude quotidienne habituelle</strong>, qui déterminera votre distance de stop<br>
+      <strong>Votre exposition sectorielle</strong> — combien de vos positions dépendent des mêmes déterminants</p>
+    </div>
+    <p>Un dernier point, hors du champ de cet article mais qu'il serait malhonnête de passer sous silence : <strong>l'enveloppe dans laquelle vous détenez vos titres a des conséquences fiscales</strong>, qui dépendent de votre pays de résidence et de votre situation personnelle. Ce sujet relève d'un professionnel habilité, pas d'un blog de trading.</p>
+
+    <h2>Mesurez ce qui vous coûte</h2>
+    <p>Comme pour les autres instruments, la réponse utile est dans vos relevés plutôt que dans un article.</p>
+    <p>Reprenez vos opérations sur actions et notez pour chacune trois éléments : la taille de la capitalisation, la présence ou non d'une publication de résultats dans la période de détention, et le résultat en R. Deux régularités apparaissent presque toujours — les positions traversant une publication produisent les résultats les plus dispersés, et les petites capitalisations concentrent les écarts d'exécution.</p>
+    <p>C'est ce qu'un <a href="/blog/comment-tenir-journal-trading">journal de trading</a> rend visible en quelques semaines, et ce constat conduit généralement à une décision simple : restreindre l'univers de titres suivis.</p>
+  </div>
+
+  <section class="bl-cta">
+    <p class="bl-cta__t">Recalculez la taille pour chaque titre</p>
+    <p>L'amplitude varie fortement d'une action à l'autre. Le calculateur du Terminal convertit votre distance de stop et votre risque accepté en taille de position exacte, valeur par valeur.</p>
+    <a class="lt-btn lt-btn--primary" href="/calculateur">Ouvrir le calculateur</a>
+  </section>
+
+  <div class="bl-prose">
+    <div class="bl-note">
+      <p><strong>Avertissement risque.</strong> Ce contenu est éducatif et ne constitue ni un conseil en investissement, ni un conseil fiscal. Aucune action, aucun secteur et aucune enveloppe de détention ne sont recommandés ici. Le traitement des dividendes, des opérations sur titres et de la vente à découvert varie selon les places de marché et les intermédiaires ; la fiscalité dépend de votre pays et de votre situation, et relève d'un professionnel habilité. Une action peut perdre l'intégralité de sa valeur, et sur les produits à effet de levier la perte peut dépasser le dépôt initial.</p>
+    </div>
+
+    <h2>FAQ</h2>
+    <div class="bl-faq">
+      <div class="bl-faq__item">
+        <h3>Qu'est-ce qui distingue une action des autres instruments ?</h3>
+        <p>Une action représente une part du capital d'une entreprise, ce qui n'a aucun équivalent parmi les devises, les indices ou les métaux. Il en découle trois particularités : elle peut verser un revenu sous forme de dividende, sa valeur dépend de résultats publiés à dates connues, et son émetteur peut faire défaut. Aucune autre classe d'actifs ne réunit ces trois caractéristiques.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Que se passe-t-il le jour du détachement du dividende ?</h3>
+        <p>Le cours est ajusté à la baisse d'un montant correspondant au dividende versé, puisque la trésorerie correspondante quitte l'entreprise. Cette baisse n'est donc pas un mouvement de marché : c'est un ajustement comptable. La méconnaître conduit à interpréter comme un signal baissier ce qui n'est qu'une écriture, et à déclencher des stops pour de mauvaises raisons.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Faut-il conserver une position pendant les résultats trimestriels ?</h3>
+        <p>Conserver une position sur une publication de résultats revient à accepter un risque distinct de l'analyse technique : le cours peut ouvrir très loin du dernier prix, au-delà du niveau de stop prévu. Beaucoup d'intervenants ferment donc leurs positions avant la publication, non par prudence de principe mais parce que la perte potentielle n'est plus bornée par le stop.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Pourquoi la liquidité varie-t-elle autant d'une action à l'autre ?</h3>
+        <p>Elle dépend directement du nombre de participants qui suivent le titre, lui-même lié à la taille de l'entreprise et à sa présence dans les grands indices. Une valeur très échangée présente des écarts serrés et absorbe des ordres importants ; une petite capitalisation peut voir son cours se déplacer sensiblement pour un volume modeste, et son carnet se vider rapidement.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Vaut-il mieux trader une action ou un indice ?</h3>
+        <p>Une action isolée réagit à sa propre actualité en plus du contexte général, ce qui ajoute une source de mouvement imprévisible et non technique. Un indice, agrégeant de nombreuses valeurs, lisse ces événements individuels. Le choix dépend donc de ce que l'on souhaite assumer : le risque propre à une entreprise, ou seulement celui du marché dans son ensemble.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Peut-on vendre à découvert une action ?</h3>
+        <p>La vente à découvert est possible sur certaines valeurs, mais elle suppose d'emprunter les titres, ce qui a un coût et n'est pas toujours disponible. Des restrictions temporaires peuvent également être imposées par les autorités sur certains titres. Les produits dérivés permettent de se positionner à la baisse plus simplement, au prix des caractéristiques propres à ces instruments.</p>
+      </div>
+    </div>
+
+    <div class="bl-author">
+      <span class="bl-author__ava">LT</span>
+      <div>
+        <p class="bl-author__name">Les fondateurs du Terminal</p>
+        <p class="bl-author__bio">Adrien et Romain, fondateurs du Terminal, conçoivent les outils et les contenus méthodologiques de la plateforme avec un principe : aucune promesse de gain, uniquement des cadres et des outils pour décider mieux.</p>
+      </div>
+    </div>
+
+    <p class="bl-src">Sources : documentation des places de marché organisées sur les opérations sur titres et la microstructure des marchés actions, 2025-2026. Les modalités varient selon les places et les intermédiaires. Publié le 24 août 2026.</p>
+
+    <div class="bl-more">
+      <h2>Pour aller plus loin</h2>
+      <div class="bl-more__grid">
+        <a href="/blog/trader-les-indices"><span class="t">Trader les indices</span><span class="d">Le panier plutôt que le titre</span></a>
+        <a href="/blog/qu-est-ce-qu-un-cfd"><span class="t">Qu'est-ce qu'un CFD</span><span class="d">Suivre une action sans la détenir</span></a>
+        <a href="/blog/carnet-d-ordres"><span class="t">Le carnet d'ordres</span><span class="d">Pourquoi la liquidité varie</span></a>
+        <a href="/blog/diversification-portefeuille"><span class="t">La diversification</span><span class="d">Cinq titres d'un secteur, un pari</span></a>
+      </div>
+    </div>
+  </div>
+</article>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var fill=document.querySelector('.lt-progress__fill'), chrome=document.getElementById('ltChrome'), raf=0;
+  function onScroll(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; var h=document.documentElement; if(fill) fill.style.width=((h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight))*100).toFixed(2)+'%'; if(chrome) chrome.classList.toggle('is-scrolled', window.scrollY>24); }); }
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  var drop=document.getElementById('ltDrop');
+  if(drop){ var menu=drop.querySelector('.lt-nav__menu'), caret=drop.querySelector('.lt-nav__caret'), trig=drop.querySelector('.lt-nav__droptrigger');
+    function so(o){ if(menu) menu.classList.toggle('is-open',o); if(caret) caret.classList.toggle('is-open',o); if(trig) trig.setAttribute('aria-expanded',o); }
+    drop.addEventListener('mouseenter',function(){so(true);}); drop.addEventListener('mouseleave',function(){so(false);});
+  }
+  /* Bascule FR/EN gérée par lang.js (délégation globale) — pas de wiring local. */
+})();
+</script>
+<script src="/appshell.js"></script>
+<script src="/menu.js"></script>
+<footer class="lt-footer ltf">
+  <div class="ltf__wrap">
+    <div class="ltf__brand">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </div>
+
+    <div class="ltf__cols">
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Tools">Outils</h4>
+        <a href="/analyzer-presentation">Setup Analyzer</a>
+        <a href="/journal-presentation" data-en="Trading Journal">Journal de Trading</a>
+        <a href="/calendrier-presentation" data-en="Economic Calendar">Calendrier Éco</a>
+        <a href="/bubble">Bubble Map</a>
+        <a href="/mur-des-trades" data-en="Trade Wall">Mur des Trades</a>
+        <a href="/patrimoine-presentation" data-en="Wealth tracker">Patrimoine</a>
+        <a href="/calculateur" data-en="Pip Calculator">Calculateur de Pips</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Markets">Marchés</h4>
+        <a href="/eco-calendrier" data-en="Overview">Présentation</a>
+        <a href="/eco-flash">Flash Info</a>
+        <a href="/eco-selection" data-en="The selection">La sélection</a>
+        <a href="/eco-crypto">Crypto</a>
+        <a href="/eco-archive" data-en="Archive">Archive</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Company">Entreprise</h4>
+        <a href="/blog">Blog</a>
+        <a href="/#method" data-en="Method">Méthode</a>
+        <a href="/#community" data-en="Community">Communauté</a>
+        <a href="/avis" data-en="Reviews">Avis</a>
+        <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Legal">Infos légales</h4>
+        <a href="/legal#mentions" data-en="Legal notice">Mentions légales</a>
+        <a href="/legal#confidentialite" data-en="Privacy">Confidentialité</a>
+        <a href="/legal#cookies" data-en="Cookies">Cookies</a>
+        <a href="/legal#cgv" data-en="Terms">CGV</a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <div class="ltf__mid">
+      <div class="ltf__social">
+        <a href="https://www.instagram.com/leterminalapp/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://t.me/leterminalfx" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 4.3 2.9 11.4c-.9.35-.88 1.65.03 1.97l4.6 1.6 1.77 5.3c.27.66 1.13.79 1.6.25l2.5-2.7 4.45 3.28c.6.44 1.46.12 1.62-.61L22.9 5.4c.2-.92-.7-1.46-1.4-1.1z"/><path d="m7.5 15 9-7.5-6.6 8.3"/></svg></a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <p class="ltf__disc" data-en="Le Terminal is a suite of research, analysis and decision-support tools for self-directed traders and investors. We provide no recommendation on specific assets and no investment advice. Trading carries a high risk and may not suit every profile: a total loss — or a loss exceeding the capital invested — is possible.">Le Terminal est une suite d'outils de recherche, d'analyse et d'aide à la décision destinée aux traders et investisseurs autonomes. Nous ne fournissons aucune recommandation sur des actifs spécifiques et ne dispensons aucun conseil en investissement. Le trading comporte un risque élevé et peut ne pas convenir à tous les profils : une perte totale, voire supérieure au capital investi, est possible.</p>
+
+    <div class="ltf__bottom">
+      <span data-en="© 2026 Le Terminal — AI-powered trading hub">© 2026 Le Terminal — Hub trading propulsé par l'IA</span>
+    </div>
+  </div>
+</footer>
+<script src="/cookies.js"></script>
+<script src="/lang.js"></script>
+<script src="/theme.js"></script>
+</body>
+</html>
