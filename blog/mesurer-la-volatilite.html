@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script>try{if(localStorage.getItem('lt_theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesurer la volatilité : ATR et amplitude | Le Terminal</title>
+<meta name="description" content="Amplitude moyenne, ATR, écart-type : comment chiffrer la volatilité d'un instrument, et la convertir en distance de stop puis en taille de position.">
+<link rel="canonical" href="https://www.leterminal.net/blog/mesurer-la-volatilite">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Le Terminal">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Mesurer la volatilité : ATR et amplitude | Le Terminal">
+<meta property="og:description" content="Amplitude moyenne, ATR, écart-type : comment chiffrer la volatilité d'un instrument, et la convertir en distance de stop puis en taille de position.">
+<meta property="og:url" content="https://www.leterminal.net/blog/mesurer-la-volatilite">
+<meta property="og:image" content="https://www.leterminal.net/blog/img/mesurer-la-volatilite-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mesurer la volatilité d'un instrument avec l'amplitude moyenne et l'ATR, puis la convertir en distance de stop et en taille de position — Le Terminal">
+<meta property="article:published_time" content="2026-09-02">
+<meta property="article:modified_time" content="2026-09-02">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mesurer la volatilité : ATR et amplitude">
+<meta name="twitter:description" content="« Adaptez la taille à la volatilité » ne veut rien dire tant qu'on ne l'a pas chiffrée. Voici comment.">
+<meta name="twitter:image" content="https://www.leterminal.net/blog/img/mesurer-la-volatilite-og.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Mesurer la volatilité : d'un chiffre à une taille de position",
+      "description": "Comment chiffrer la volatilité d'un instrument — amplitude moyenne, true range et ATR, écart-type — puis convertir cette mesure en distance de stop et en taille de position, avec les limites de chaque indicateur et la notion de régime de volatilité.",
+      "datePublished": "2026-09-02",
+      "dateModified": "2026-09-02",
+      "inLanguage": "fr-FR",
+      "author": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/",
+        "logo": { "@type": "ImageObject", "url": "https://www.leterminal.net/logo.png" }
+      },
+      "image": "https://www.leterminal.net/blog/img/mesurer-la-volatilite-og.jpg",
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.leterminal.net/blog/mesurer-la-volatilite" },
+      "keywords": "volatilité, ATR, true range, amplitude moyenne, écart-type, distance de stop, taille de position, régime de volatilité"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que l'ATR en trading ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'ATR, ou average true range, est la moyenne du true range sur un nombre de périodes donné, le plus souvent quatorze. Le true range d'une bougie est la plus grande des trois distances suivantes : entre son plus haut et son plus bas, entre son plus haut et la clôture précédente, entre son plus bas et cette même clôture. Cette construction permet de tenir compte des écarts de cotation, qu'une simple amplitude ignorerait."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment convertir la volatilité en distance de stop ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La démarche consiste à exprimer la distance de stop en multiples de la volatilité mesurée plutôt qu'en valeur fixe. Un stop inférieur à une unité de volatilité quotidienne sera touché par le mouvement ordinaire de l'instrument, sans qu'aucun scénario ne soit invalidé. Le multiple retenu se calibre sur ses propres relevés : aucune valeur n'est universellement correcte, et elle dépend de l'unité de temps comme du type de configuration."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "La volatilité indique-t-elle la direction du marché ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Non. La volatilité mesure l'ampleur des mouvements, jamais leur sens. Une volatilité élevée signale que le prix parcourt de grandes distances, sans rien dire de la direction. C'est la confusion la plus fréquente : un indicateur de volatilité qui monte n'annonce ni hausse ni baisse, seulement des mouvements plus amples dans un sens ou dans l'autre."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'un régime de volatilité ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La volatilité a tendance à se regrouper dans le temps : les périodes agitées succèdent aux périodes agitées, les périodes calmes aux périodes calmes. On parle alors de régimes. Cette persistance est l'une des régularités les mieux établies des marchés, et elle a une conséquence pratique : la volatilité récente est un point de départ raisonnable pour estimer celle des prochaines séances, contrairement à la direction."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quelle différence entre ATR et écart-type ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "L'ATR mesure une amplitude moyenne en unités de prix, directement utilisable pour placer un stop. L'écart-type mesure la dispersion des variations autour de leur moyenne et s'exprime en pourcentage, ce qui permet de comparer des instruments entre eux. Le premier sert surtout à dimensionner une opération, le second à comparer et à situer un niveau de volatilité par rapport à son historique."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Faut-il réduire sa position quand la volatilité augmente ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "C'est la conséquence arithmétique d'un risque constant. Si la distance de stop s'élargit parce que l'instrument bouge davantage, la taille doit diminuer pour que la perte potentielle en euros reste identique. Il ne s'agit pas d'un choix de prudence mais d'une conséquence du calcul : à risque fixé, taille et distance de stop varient toujours en sens inverse."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.leterminal.net/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.leterminal.net/blog" },
+        { "@type": "ListItem", "position": 3, "name": "Mesurer la volatilité", "item": "https://www.leterminal.net/blog/mesurer-la-volatilite" }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/anton-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="/design-system.css">
+<link rel="stylesheet" href="/theme-light.css">
+<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+<a id="top"></a>
+<div class="lt-progress" aria-hidden="true"><span class="lt-progress__fill"></span></div>
+
+<!-- CHROME -->
+<div class="lt-chrome" id="ltChrome">
+  <header class="lt-nav">
+    <a class="lt-nav__brand" href="/">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </a>
+    <nav class="lt-nav__links">
+      <div class="lt-nav__drop" id="ltDrop">
+        <button class="lt-nav__droptrigger" aria-expanded="false" data-en="Tools <span class='lt-nav__caret'><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg></span>">
+          Outils <span class="lt-nav__caret"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="lt-nav__menu">
+          <a class="lt-nav__menuitem" href="/"><span class="lt-nav__menutop"><span class="lt-nav__menulabel" data-en="Home">Accueil</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Overview">Vue d'ensemble</span></a>
+          <a class="lt-nav__menuitem" href="/journal-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Journal de Trading</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Calendar · P&amp;L · AI coach">Calendrier · P&amp;L · IA coach</span></a>
+          <a class="lt-nav__menuitem" href="/analyzer-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Setup Analyzer</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="AI score for your setup">Score IA de votre setup</span></a>
+          <a class="lt-nav__menuitem" href="/patrimoine-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Patrimoine</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Long-term portfolio">Portefeuille long terme</span></a>
+          <a class="lt-nav__menuitem" href="/calendrier-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calendrier Éco</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc">NFP · CPI · FOMC</span></a>
+          <a class="lt-nav__menuitem" href="/bubble"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Bubble Map</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Live capital flows">Flux de capitaux en direct</span></a>
+          <a class="lt-nav__menuitem" href="/calculateur"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calculateur de Pips</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Position · risk · R:R">Position · risque · R:R</span></a>
+          <a class="lt-nav__menuitem" href="/mur-des-trades"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Mur des Trades</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Community-shared trades">Trades partagés par la communauté</span></a>
+        </div>
+      </div>
+      <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      <a href="/#method" data-en="Method">Méthode</a>
+      <a href="/#community" data-en="Community">Communauté</a>
+      <a href="/avis" data-en="Reviews">Avis</a>
+      <a href="/blog">Blog</a>
+    </nav>
+    <div class="lt-nav__actions">
+      <span class="lt-nav__pill" id="ltLangPill" title="Changer de langue">FR</span>
+      <button class="lt-btn lt-btn--ghost lt-btn--sm" id="loginBtn" onclick="window.ltOpenLogin?ltOpenLogin():void(0)" data-en="Sign in">Connexion</button>
+      <div id="ltUserBar"></div>
+      <a class="lt-btn lt-btn--primary lt-btn--sm lt-nav__cta" href="/tarifs"><svg class="lt-nav__cta-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l4.5 3.5L12 5l3.5 6.5L20 8l-1.6 9.5H5.6z"/></svg><span class="lt-nav__cta-txt" data-en="Premium Access">Accès Premium</span></a>
+    </div>
+  </header>
+</div>
+
+<main class="bl-wrap">
+<article class="bl-art">
+  <nav class="bl-crumb" aria-label="Fil d'Ariane">
+    <a href="/" data-en="Home">Accueil</a><span class="sep">→</span><a href="/blog">Blog</a><span class="sep">→</span><span class="cur">Mesurer la volatilité</span>
+  </nav>
+
+  <span class="lt-eyebrow"><span class="lt-dot"></span> Calcul</span>
+  <h1 class="bl-art__title">Mesurer la volatilité : d'un chiffre à une taille de position</h1>
+  <div class="bl-art__meta">
+    <span data-en="By the founders of Le Terminal">Par les fondateurs du Terminal</span>
+    <span>·</span>
+    <span data-en="Published September 2, 2026">Publié le 2 septembre 2026</span>
+    <span>·</span>
+    <span data-en="12 min read">12 min de lecture</span>
+  </div>
+
+  <figure class="bl-art__hero">
+    <img src="/blog/img/mesurer-la-volatilite.webp" width="1600" height="900" alt="Mesurer la volatilité d'un instrument avec l'amplitude moyenne et l'ATR, puis convertir ce chiffre en distance de stop et en taille de position à risque constant" fetchpriority="high">
+  </figure>
+
+  <div class="bl-lead">
+    <p><strong>En bref.</strong> « Adaptez votre taille à la volatilité » est le conseil le plus répété du trading — et le plus inutile tant qu'on ne l'a pas chiffré. Cet article comble ce trou : <strong>comment mesurer réellement</strong> combien un instrument bouge, avec quels indicateurs, et comment ce chiffre devient une distance de stop puis une taille de position. Un rappel préalable : <strong>la volatilité ne dit rien de la direction</strong>.</p>
+  </div>
+
+  <div class="bl-prose">
+    <p>Nous devons commencer par un aveu. Sur ce blog, nous avons écrit à de multiples reprises qu'il fallait « calibrer le stop sur la volatilité de l'instrument » — pour <a href="/blog/trader-l-or">l'or</a>, pour les <a href="/blog/trader-les-cryptomonnaies">cryptomonnaies</a>, pour les <a href="/blog/trader-les-indices">indices</a>.</p>
+    <p>Sans jamais expliquer <strong>comment on la mesure</strong>. Voici la pièce manquante.</p>
+
+    <h2>Ce que la volatilité est, et n'est pas</h2>
+    <p>La volatilité mesure <strong>l'ampleur des mouvements d'un prix</strong>, pas leur sens.</p>
+    <p>Cette phrase paraît évidente et elle est pourtant à l'origine de l'erreur la plus fréquente sur le sujet. Un indicateur de volatilité qui monte n'annonce ni hausse ni baisse : il indique que le prix parcourt de plus grandes distances, dans un sens ou dans l'autre. Aucun indicateur de volatilité n'est directionnel.</p>
+    <div class="bl-note">
+      <p><strong>À quoi elle sert réellement</strong><br>
+      <strong>À placer un stop</strong> qui ne soit pas touché par le mouvement ordinaire de l'instrument<br>
+      <strong>À dimensionner</strong> la position en conséquence, à risque constant<br>
+      <strong>À fixer un objectif réaliste</strong> — viser 100 points sur un instrument qui en parcourt 60 par jour n'a pas de sens<br>
+      <strong>À comparer</strong> deux instruments avant d'y transposer une méthode</p>
+    </div>
+
+    <h2>La mesure la plus simple : l'amplitude moyenne</h2>
+    <p>Commençons par ce que tout le monde peut calculer sans outil.</p>
+    <p>Prenez les vingt dernières séances. Pour chacune, notez la distance entre le plus haut et le plus bas. Faites la moyenne. Vous obtenez l'<strong>amplitude moyenne quotidienne</strong> de l'instrument.</p>
+    <p>C'est grossier, et c'est déjà énormément plus utile que rien. Ce seul chiffre répond immédiatement à trois questions : mon objectif est-il atteignable dans la journée, mon stop est-il à l'intérieur du bruit quotidien, et cet instrument est-il comparable à celui que je trade d'habitude ?</p>
+
+    <h3>Sa limite</h3>
+    <p>Elle ignore ce qui se passe <em>entre</em> les séances. Si un instrument ouvre loin de sa clôture de la veille — le gap détaillé dans <a href="/blog/trader-les-indices">trader les indices</a> —, l'amplitude de la séance ne capture pas ce saut. Sur un marché qui ferme, elle sous-estime donc le mouvement réel.</p>
+
+    <h2>L'ATR, et pourquoi il existe</h2>
+    <p>C'est précisément le problème que résout le <strong>true range</strong>, dont l'ATR est la moyenne.</p>
+    <p>Le true range d'une bougie est <strong>la plus grande des trois distances</strong> suivantes :</p>
+    <div class="bl-note">
+      <p><strong>1.</strong> Entre le plus haut et le plus bas de la bougie<br>
+      <strong>2.</strong> Entre le plus haut et la <em>clôture précédente</em><br>
+      <strong>3.</strong> Entre le plus bas et cette même <em>clôture précédente</em></p>
+    </div>
+    <p>Les deux dernières lignes sont toute l'astuce : en se référant à la clôture de la veille, elles capturent le gap. Une séance qui ouvre très bas puis reste étale aura une amplitude faible mais un true range élevé — ce qui reflète correctement ce que vous auriez vécu en position.</p>
+    <p>L'<strong>ATR</strong> (<em>average true range</em>) est la moyenne de ce true range sur un nombre de périodes donné, quatorze par convention. Il s'exprime dans l'unité de prix de l'instrument, ce qui le rend directement utilisable.</p>
+
+    <h3>Ce qu'il faut en retenir</h3>
+    <ul>
+      <li>Il se lit <strong>dans l'unité de temps du graphique</strong> : un ATR sur un graphique horaire mesure l'amplitude d'une heure, pas d'une journée.</li>
+      <li>Il est <strong>rétrospectif</strong>. Il décrit ce qui vient de se passer, et n'anticipe rien.</li>
+      <li>Il ne se compare pas d'un instrument à l'autre en valeur absolue : un ATR de 15 ne signifie rien sans savoir de quel prix on parle.</li>
+    </ul>
+    <p>C'est l'un des rares indicateurs que nous recommandons sans réserve dans notre article sur les <a href="/blog/indicateurs-techniques-trading">indicateurs techniques</a> — précisément parce qu'il ne prétend pas prédire.</p>
+
+    <h2>L'écart-type, pour comparer</h2>
+    <p>Troisième mesure, utile pour une autre question : <strong>comparer</strong>.</p>
+    <p>L'écart-type mesure la dispersion des variations d'un prix autour de leur moyenne. Comme il s'exprime en pourcentage, il permet de mettre côte à côte des instruments dont les prix n'ont rien à voir.</p>
+    <p>C'est aussi ce qui sous-tend les bandes de volatilité que proposent les plateformes : elles tracent un écart-type de part et d'autre d'une moyenne mobile, et s'écartent donc mécaniquement quand la dispersion augmente.</p>
+    <div class="bl-note">
+      <p><strong>Le partage des rôles</strong><br>
+      <strong>ATR</strong> — en unités de prix, pour <em>dimensionner</em> une opération précise<br>
+      <strong>Écart-type</strong> — en pourcentage, pour <em>comparer</em> des instruments et situer la volatilité actuelle par rapport à son historique</p>
+    </div>
+
+    <h2>Les régimes de volatilité</h2>
+    <p>Voici la propriété qui rend ces mesures exploitables, et elle n'a rien d'anecdotique.</p>
+    <p><strong>La volatilité se regroupe dans le temps.</strong> Les séances agitées succèdent aux séances agitées, les séances calmes aux séances calmes. C'est l'une des régularités les mieux établies des marchés financiers.</p>
+    <p>La conséquence pratique est considérable : contrairement à la direction, qui n'est pas prévisible, <strong>la volatilité récente constitue un point de départ raisonnable</strong> pour estimer celle des prochaines séances. C'est ce qui permet de calibrer un stop aujourd'hui à partir d'une mesure d'hier.</p>
+    <p>Deux réserves, cependant :</p>
+    <ul>
+      <li><strong>Les régimes changent, parfois brutalement.</strong> Une publication majeure peut faire passer un instrument d'un régime calme à un régime agité en quelques minutes — d'où l'utilité du <a href="/blog/calendrier-economique-trading">calendrier économique</a>.</li>
+      <li><strong>Une mesure rétrospective est en retard.</strong> Après un choc, l'ATR met plusieurs séances à refléter le nouveau niveau.</li>
+    </ul>
+
+    <h2>Du chiffre à la distance de stop</h2>
+    <p>Passons à l'application, qui est l'objet de tout ce qui précède.</p>
+    <p>Le principe : <strong>exprimer la distance de stop en multiples de la volatilité mesurée</strong>, plutôt qu'en valeur fixe ou en chiffre rond.</p>
+    <p>La logique se tient en une phrase. Si votre stop est plus proche que le mouvement ordinaire de l'instrument, il sera touché par ce mouvement ordinaire — <strong>sans qu'aucun scénario n'ait été invalidé</strong>. Vous perdez alors non pas parce que votre analyse était fausse, mais parce que votre stop était à l'intérieur du bruit.</p>
+    <p>Ce raisonnement complète, sans le remplacer, celui de la <a href="/blog/gestion-du-risque-trading">gestion du risque</a> : le stop se place d'abord selon la <strong>structure</strong> du marché — sous le point d'invalidation. La volatilité sert à vérifier que ce niveau structurel est bien à l'extérieur du bruit, et à ajouter une marge quand il ne l'est pas.</p>
+    <p>Quant au multiple à retenir, nous n'en donnerons pas. Aucune valeur n'est universellement correcte : elle dépend de l'unité de temps, du type de configuration et de votre tolérance aux sorties prématurées. <strong>Elle se calibre sur vos propres relevés</strong>, ce qui est exactement le travail que permet un <a href="/blog/backtester-une-strategie">backtest</a>.</p>
+
+    <h2>De la distance à la taille</h2>
+    <p>Dernière étape, et c'est de l'arithmétique pure.</p>
+    <p>À risque en euros constant, <strong>la taille de position et la distance de stop varient toujours en sens inverse</strong>. Si la volatilité augmente, la distance de stop s'élargit, donc la taille doit diminuer pour que la perte potentielle reste identique.</p>
+    <div class="bl-note">
+      <p><strong>Ce n'est pas de la prudence, c'est du calcul.</strong> Réduire la taille quand la volatilité augmente ne relève d'aucun choix de tempérament : c'est la seule façon de maintenir constant le montant réellement risqué.</p>
+    </div>
+    <p>C'est précisément ce que fait le <a href="/calculateur">calculateur du Terminal</a> : à partir de votre capital, du pourcentage accepté et de la distance de stop, il rend la taille exacte. La volatilité mesurée est ce qui vous donne le troisième paramètre de façon défendable, au lieu de le choisir au jugé.</p>
+    <p>Le même raisonnement explique pourquoi une taille calibrée sur une paire de devises majeure produit des pertes hors proportion sur une cryptomonnaie ou sur l'or : le paramètre a changé, pas la formule.</p>
+
+    <h2>Les erreurs classiques</h2>
+
+    <h3>Y chercher une direction</h3>
+    <p>Déjà dit, et c'est la plus répandue. Une volatilité en hausse n'annonce pas une baisse — elle annonce des mouvements plus amples.</p>
+
+    <h3>Confondre les unités de temps</h3>
+    <p>Un ATR lu sur un graphique de cinq minutes n'a aucun rapport avec la distance de stop d'un trade tenu plusieurs jours. La mesure doit être prise sur l'unité de temps de la décision.</p>
+
+    <h3>Comparer des valeurs absolues</h3>
+    <p>Un ATR de 12 n'est ni « élevé » ni « faible » dans l'absolu. Il ne prend un sens qu'en proportion du prix, ou en comparaison avec l'historique du même instrument.</p>
+
+    <h3>Élargir le stop sans réduire la taille</h3>
+    <p>L'erreur la plus coûteuse de la liste. Reconnaître qu'un instrument est volatil et allonger le stop en conséquence, mais conserver la même taille, revient à <strong>augmenter le risque en euros</strong> — l'inverse exact de l'intention.</p>
+
+    <h2>Le protocole, en cinq minutes</h2>
+    <p>Rien de ce qui précède ne demande d'outil sophistiqué. Avant de trader un instrument que vous ne connaissez pas :</p>
+    <ul>
+      <li><strong>Relevez l'amplitude moyenne</strong> sur les vingt dernières séances, ou lisez l'ATR sur l'unité de temps de votre décision.</li>
+      <li><strong>Comparez-la</strong> à celle de l'instrument que vous tradez habituellement. Le rapport entre les deux vous dit de combien votre taille doit changer.</li>
+      <li><strong>Vérifiez que votre stop structurel</strong> est à l'extérieur de ce mouvement ordinaire. S'il est à l'intérieur, ce n'est pas le stop qu'il faut resserrer : c'est la configuration qu'il faut écarter.</li>
+      <li><strong>Recalculez la taille</strong> avec la nouvelle distance, à risque identique.</li>
+      <li><strong>Notez la mesure</strong> dans votre relevé, pour pouvoir plus tard comparer vos résultats entre régimes calmes et agités.</li>
+    </ul>
+    <p>Ce dernier point est celui qui rapporte le plus à moyen terme. Consigner l'ATR au moment de l'entrée dans un <a href="/blog/comment-tenir-journal-trading">journal de trading</a> permet, au bout de quelques dizaines d'opérations, de répondre à une question que presque personne ne se pose : <strong>vos résultats sont-ils meilleurs en marché calme ou en marché agité ?</strong> La réponse conduit souvent à ne trader qu'un seul des deux.</p>
+  </div>
+
+  <section class="bl-cta">
+    <p class="bl-cta__t">Convertissez la mesure en taille</p>
+    <p>Capital, risque accepté, distance de stop issue de votre mesure de volatilité : le calculateur du Terminal rend la taille exacte de la position, instrument par instrument.</p>
+    <a class="lt-btn lt-btn--primary" href="/calculateur">Ouvrir le calculateur</a>
+  </section>
+
+  <div class="bl-prose">
+    <div class="bl-note">
+      <p><strong>Avertissement risque.</strong> Ce contenu est éducatif et ne constitue pas un conseil en investissement. Aucun réglage d'indicateur, aucun multiple de volatilité et aucune valeur de paramètre ne sont recommandés : les repères décrits doivent être calibrés sur vos propres données. Une mesure de volatilité est rétrospective et n'anticipe ni l'ampleur ni le sens des mouvements à venir. Le trading comporte un risque de perte en capital pouvant dépasser le dépôt initial sur les produits à effet de levier.</p>
+    </div>
+
+    <h2>FAQ</h2>
+    <div class="bl-faq">
+      <div class="bl-faq__item">
+        <h3>Qu'est-ce que l'ATR en trading ?</h3>
+        <p>L'ATR, ou average true range, est la moyenne du true range sur un nombre de périodes donné, le plus souvent quatorze. Le true range d'une bougie est la plus grande des trois distances suivantes : entre son plus haut et son plus bas, entre son plus haut et la clôture précédente, entre son plus bas et cette même clôture. Cette construction permet de tenir compte des écarts de cotation, qu'une simple amplitude ignorerait.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Comment convertir la volatilité en distance de stop ?</h3>
+        <p>La démarche consiste à exprimer la distance de stop en multiples de la volatilité mesurée plutôt qu'en valeur fixe. Un stop inférieur à une unité de volatilité quotidienne sera touché par le mouvement ordinaire de l'instrument, sans qu'aucun scénario ne soit invalidé. Le multiple retenu se calibre sur ses propres relevés : aucune valeur n'est universellement correcte, et elle dépend de l'unité de temps comme du type de configuration.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>La volatilité indique-t-elle la direction du marché ?</h3>
+        <p>Non. La volatilité mesure l'ampleur des mouvements, jamais leur sens. Une volatilité élevée signale que le prix parcourt de grandes distances, sans rien dire de la direction. C'est la confusion la plus fréquente : un indicateur de volatilité qui monte n'annonce ni hausse ni baisse, seulement des mouvements plus amples dans un sens ou dans l'autre.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Qu'est-ce qu'un régime de volatilité ?</h3>
+        <p>La volatilité a tendance à se regrouper dans le temps : les périodes agitées succèdent aux périodes agitées, les périodes calmes aux périodes calmes. On parle alors de régimes. Cette persistance est l'une des régularités les mieux établies des marchés, et elle a une conséquence pratique : la volatilité récente est un point de départ raisonnable pour estimer celle des prochaines séances, contrairement à la direction.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Quelle différence entre ATR et écart-type ?</h3>
+        <p>L'ATR mesure une amplitude moyenne en unités de prix, directement utilisable pour placer un stop. L'écart-type mesure la dispersion des variations autour de leur moyenne et s'exprime en pourcentage, ce qui permet de comparer des instruments entre eux. Le premier sert surtout à dimensionner une opération, le second à comparer et à situer un niveau de volatilité par rapport à son historique.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Faut-il réduire sa position quand la volatilité augmente ?</h3>
+        <p>C'est la conséquence arithmétique d'un risque constant. Si la distance de stop s'élargit parce que l'instrument bouge davantage, la taille doit diminuer pour que la perte potentielle en euros reste identique. Il ne s'agit pas d'un choix de prudence mais d'une conséquence du calcul : à risque fixé, taille et distance de stop varient toujours en sens inverse.</p>
+      </div>
+    </div>
+
+    <div class="bl-author">
+      <span class="bl-author__ava">LT</span>
+      <div>
+        <p class="bl-author__name">Les fondateurs du Terminal</p>
+        <p class="bl-author__bio">Adrien et Romain, fondateurs du Terminal, conçoivent les outils et les contenus méthodologiques de la plateforme avec un principe : aucune promesse de gain, uniquement des cadres et des outils pour décider mieux.</p>
+      </div>
+    </div>
+
+    <p class="bl-src">Sources : littérature classique d'analyse technique sur les mesures d'amplitude et travaux sur le regroupement de la volatilité en finance de marché, 2025-2026. Aucun paramètre n'est recommandé. Publié le 2 septembre 2026.</p>
+
+    <div class="bl-more">
+      <h2>Pour aller plus loin</h2>
+      <div class="bl-more__grid">
+        <a href="/blog/gestion-du-risque-trading"><span class="t">Gestion du risque</span><span class="d">Placer le stop, puis dimensionner</span></a>
+        <a href="/blog/indicateurs-techniques-trading"><span class="t">Les indicateurs techniques</span><span class="d">Pourquoi l'ATR fait exception</span></a>
+        <a href="/blog/backtester-une-strategie"><span class="t">Backtester une stratégie</span><span class="d">Calibrer le multiple sur vos données</span></a>
+        <a href="/blog/calculer-les-pips"><span class="t">Calculer les pips</span><span class="d">Convertir une distance en euros</span></a>
+      </div>
+    </div>
+  </div>
+</article>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var fill=document.querySelector('.lt-progress__fill'), chrome=document.getElementById('ltChrome'), raf=0;
+  function onScroll(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; var h=document.documentElement; if(fill) fill.style.width=((h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight))*100).toFixed(2)+'%'; if(chrome) chrome.classList.toggle('is-scrolled', window.scrollY>24); }); }
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  var drop=document.getElementById('ltDrop');
+  if(drop){ var menu=drop.querySelector('.lt-nav__menu'), caret=drop.querySelector('.lt-nav__caret'), trig=drop.querySelector('.lt-nav__droptrigger');
+    function so(o){ if(menu) menu.classList.toggle('is-open',o); if(caret) caret.classList.toggle('is-open',o); if(trig) trig.setAttribute('aria-expanded',o); }
+    drop.addEventListener('mouseenter',function(){so(true);}); drop.addEventListener('mouseleave',function(){so(false);});
+  }
+  /* Bascule FR/EN gérée par lang.js (délégation globale) — pas de wiring local. */
+})();
+</script>
+<script src="/appshell.js"></script>
+<script src="/menu.js"></script>
+<footer class="lt-footer ltf">
+  <div class="ltf__wrap">
+    <div class="ltf__brand">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </div>
+
+    <div class="ltf__cols">
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Tools">Outils</h4>
+        <a href="/analyzer-presentation">Setup Analyzer</a>
+        <a href="/journal-presentation" data-en="Trading Journal">Journal de Trading</a>
+        <a href="/calendrier-presentation" data-en="Economic Calendar">Calendrier Éco</a>
+        <a href="/bubble">Bubble Map</a>
+        <a href="/mur-des-trades" data-en="Trade Wall">Mur des Trades</a>
+        <a href="/patrimoine-presentation" data-en="Wealth tracker">Patrimoine</a>
+        <a href="/calculateur" data-en="Pip Calculator">Calculateur de Pips</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Markets">Marchés</h4>
+        <a href="/eco-calendrier" data-en="Overview">Présentation</a>
+        <a href="/eco-flash">Flash Info</a>
+        <a href="/eco-selection" data-en="The selection">La sélection</a>
+        <a href="/eco-crypto">Crypto</a>
+        <a href="/eco-archive" data-en="Archive">Archive</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Company">Entreprise</h4>
+        <a href="/blog">Blog</a>
+        <a href="/#method" data-en="Method">Méthode</a>
+        <a href="/#community" data-en="Community">Communauté</a>
+        <a href="/avis" data-en="Reviews">Avis</a>
+        <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Legal">Infos légales</h4>
+        <a href="/legal#mentions" data-en="Legal notice">Mentions légales</a>
+        <a href="/legal#confidentialite" data-en="Privacy">Confidentialité</a>
+        <a href="/legal#cookies" data-en="Cookies">Cookies</a>
+        <a href="/legal#cgv" data-en="Terms">CGV</a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <div class="ltf__mid">
+      <div class="ltf__social">
+        <a href="https://www.instagram.com/leterminalapp/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://t.me/leterminalfx" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 4.3 2.9 11.4c-.9.35-.88 1.65.03 1.97l4.6 1.6 1.77 5.3c.27.66 1.13.79 1.6.25l2.5-2.7 4.45 3.28c.6.44 1.46.12 1.62-.61L22.9 5.4c.2-.92-.7-1.46-1.4-1.1z"/><path d="m7.5 15 9-7.5-6.6 8.3"/></svg></a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <p class="ltf__disc" data-en="Le Terminal is a suite of research, analysis and decision-support tools for self-directed traders and investors. We provide no recommendation on specific assets and no investment advice. Trading carries a high risk and may not suit every profile: a total loss — or a loss exceeding the capital invested — is possible.">Le Terminal est une suite d'outils de recherche, d'analyse et d'aide à la décision destinée aux traders et investisseurs autonomes. Nous ne fournissons aucune recommandation sur des actifs spécifiques et ne dispensons aucun conseil en investissement. Le trading comporte un risque élevé et peut ne pas convenir à tous les profils : une perte totale, voire supérieure au capital investi, est possible.</p>
+
+    <div class="ltf__bottom">
+      <span data-en="© 2026 Le Terminal — AI-powered trading hub">© 2026 Le Terminal — Hub trading propulsé par l'IA</span>
+    </div>
+  </div>
+</footer>
+<script src="/cookies.js"></script>
+<script src="/lang.js"></script>
+<script src="/theme.js"></script>
+</body>
+</html>
