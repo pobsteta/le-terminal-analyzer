@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script>try{if(localStorage.getItem('lt_theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sortir d'un trade : objectif, partielles, stop | Le Terminal</title>
+<meta name="description" content="Objectif fixe, prises partielles, stop au point mort, sortie par le temps : ce que chaque règle de sortie coûte, ce qu'elle rapporte, et comment choisir.">
+<link rel="canonical" href="https://www.leterminal.net/blog/sortir-d-un-trade">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Le Terminal">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Sortir d'un trade : objectif, partielles, stop | Le Terminal">
+<meta property="og:description" content="Objectif fixe, prises partielles, stop au point mort, sortie par le temps : ce que chaque règle de sortie coûte, ce qu'elle rapporte, et comment choisir.">
+<meta property="og:url" content="https://www.leterminal.net/blog/sortir-d-un-trade">
+<meta property="og:image" content="https://www.leterminal.net/blog/img/sortir-d-un-trade-og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Les quatre règles de sortie d'un trade — objectif fixe, prises partielles, stop au point mort, sortie par le temps — et ce que chacune coûte — Le Terminal">
+<meta property="article:published_time" content="2026-09-02">
+<meta property="article:modified_time" content="2026-09-02">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sortir d'un trade : objectif, partielles, stop">
+<meta name="twitter:description" content="Toute règle qui réduit la variance réduit aussi l'espérance. La question n'est pas laquelle est la meilleure.">
+<meta name="twitter:image" content="https://www.leterminal.net/blog/img/sortir-d-un-trade-og.jpg">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "Sortir d'un trade : objectif fixe, prises partielles ou stop suiveur",
+      "description": "Les quatre politiques de sortie d'une position — objectif fixe, prises partielles, remontée du stop au point mort, sortie par le temps — avec pour chacune ce qu'elle apporte et ce qu'elle coûte, l'arbitrage entre variance et espérance, et la méthode pour trancher sur ses propres relevés.",
+      "datePublished": "2026-09-02",
+      "dateModified": "2026-09-02",
+      "inLanguage": "fr-FR",
+      "author": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Le Terminal",
+        "url": "https://www.leterminal.net/",
+        "logo": { "@type": "ImageObject", "url": "https://www.leterminal.net/logo.png" }
+      },
+      "image": "https://www.leterminal.net/blog/img/sortir-d-un-trade-og.jpg",
+      "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.leterminal.net/blog/sortir-d-un-trade" },
+      "keywords": "sortie de position, objectif fixe, prise partielle, point mort, break even, sortie par le temps, espérance, variance"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Faut-il prendre des bénéfices partiels ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Une prise partielle réduit la variabilité des résultats et rend la série de trades plus confortable à vivre, mais elle diminue le gain moyen : la fraction fermée tôt ne participe pas aux mouvements les plus amples, qui font l'essentiel de la performance des méthodes de suivi de tendance. Ce n'est donc pas une amélioration en soi mais un arbitrage, à trancher sur ses propres relevés plutôt que sur un principe général."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Faut-il remonter son stop au point mort ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Remonter le stop au prix d'entrée supprime le risque de perte sur l'opération, ce qui est psychologiquement puissant. En contrepartie, cela augmente nettement le nombre de sorties à zéro : un repli parfaitement normal suffit à déclencher la sortie avant que le mouvement attendu ne se produise. Le déplacement doit donc être conditionné à un événement du marché, jamais au simple fait d'être en gain."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quand fixer son objectif de sortie ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Avant d'entrer, en même temps que le niveau d'invalidation. C'est ce qui permet de calculer le rapport entre ce qui est risqué et ce qui est visé, et donc de décider si l'opération vaut d'être prise. Un objectif fixé après l'entrée est déterminé par le résultat courant et non par la structure du marché, ce qui en fait une décision émotionnelle déguisée en analyse."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce qu'une sortie par le temps ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "C'est la fermeture d'une position au bout d'une durée définie à l'avance, indépendamment du prix atteint. La logique est qu'un scénario attendu qui ne se réalise pas dans le délai prévu est probablement invalidé, même si le stop n'a pas été touché. Cette règle libère du capital et de l'attention, et réduit l'exposition aux événements imprévus sur les positions qui stagnent."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Faut-il laisser courir ses gains ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cette maxime décrit une caractéristique réelle de certaines approches : dans une méthode de suivi de tendance, un petit nombre d'opérations très favorables compense de nombreuses pertes limitées. Elle n'a en revanche aucun sens dans une méthode conçue pour des objectifs courts en range, où les mouvements amples sont rares. La règle de sortie doit correspondre au type de mouvement recherché."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment savoir quelle règle de sortie me convient ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En la mesurant plutôt qu'en la choisissant. Il suffit de noter, pour chaque opération, le prix atteint au plus favorable avant la sortie effective. Sur plusieurs dizaines de trades, la comparaison entre ce potentiel et le résultat réellement obtenu indique si vous sortez trop tôt, trop tard, ou au bon endroit — une réponse propre à votre méthode et à vos instruments."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.leterminal.net/" },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.leterminal.net/blog" },
+        { "@type": "ListItem", "position": 3, "name": "Sortir d'un trade", "item": "https://www.leterminal.net/blog/sortir-d-un-trade" }
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/anton-400-latin.woff2" crossorigin>
+<link rel="stylesheet" href="/fonts.css">
+<link rel="stylesheet" href="/design-system.css">
+<link rel="stylesheet" href="/theme-light.css">
+<link rel="stylesheet" href="/home.css">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+<a id="top"></a>
+<div class="lt-progress" aria-hidden="true"><span class="lt-progress__fill"></span></div>
+
+<!-- CHROME -->
+<div class="lt-chrome" id="ltChrome">
+  <header class="lt-nav">
+    <a class="lt-nav__brand" href="/">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </a>
+    <nav class="lt-nav__links">
+      <div class="lt-nav__drop" id="ltDrop">
+        <button class="lt-nav__droptrigger" aria-expanded="false" data-en="Tools <span class='lt-nav__caret'><svg width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg></span>">
+          Outils <span class="lt-nav__caret"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </button>
+        <div class="lt-nav__menu">
+          <a class="lt-nav__menuitem" href="/"><span class="lt-nav__menutop"><span class="lt-nav__menulabel" data-en="Home">Accueil</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Overview">Vue d'ensemble</span></a>
+          <a class="lt-nav__menuitem" href="/journal-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Journal de Trading</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Calendar · P&amp;L · AI coach">Calendrier · P&amp;L · IA coach</span></a>
+          <a class="lt-nav__menuitem" href="/analyzer-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Setup Analyzer</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="AI score for your setup">Score IA de votre setup</span></a>
+          <a class="lt-nav__menuitem" href="/patrimoine-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Patrimoine</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Long-term portfolio">Portefeuille long terme</span></a>
+          <a class="lt-nav__menuitem" href="/calendrier-presentation"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calendrier Éco</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc">NFP · CPI · FOMC</span></a>
+          <a class="lt-nav__menuitem" href="/bubble"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Bubble Map</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Live capital flows">Flux de capitaux en direct</span></a>
+          <a class="lt-nav__menuitem" href="/calculateur"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Calculateur de Pips</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Position · risk · R:R">Position · risque · R:R</span></a>
+          <a class="lt-nav__menuitem" href="/mur-des-trades"><span class="lt-nav__menutop"><span class="lt-nav__menulabel">Mur des Trades</span><span class="lt-dot"></span></span><span class="lt-nav__menudesc" data-en="Community-shared trades">Trades partagés par la communauté</span></a>
+        </div>
+      </div>
+      <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      <a href="/#method" data-en="Method">Méthode</a>
+      <a href="/#community" data-en="Community">Communauté</a>
+      <a href="/avis" data-en="Reviews">Avis</a>
+      <a href="/blog">Blog</a>
+    </nav>
+    <div class="lt-nav__actions">
+      <span class="lt-nav__pill" id="ltLangPill" title="Changer de langue">FR</span>
+      <button class="lt-btn lt-btn--ghost lt-btn--sm" id="loginBtn" onclick="window.ltOpenLogin?ltOpenLogin():void(0)" data-en="Sign in">Connexion</button>
+      <div id="ltUserBar"></div>
+      <a class="lt-btn lt-btn--primary lt-btn--sm lt-nav__cta" href="/tarifs"><svg class="lt-nav__cta-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8l4.5 3.5L12 5l3.5 6.5L20 8l-1.6 9.5H5.6z"/></svg><span class="lt-nav__cta-txt" data-en="Premium Access">Accès Premium</span></a>
+    </div>
+  </header>
+</div>
+
+<main class="bl-wrap">
+<article class="bl-art">
+  <nav class="bl-crumb" aria-label="Fil d'Ariane">
+    <a href="/" data-en="Home">Accueil</a><span class="sep">→</span><a href="/blog">Blog</a><span class="sep">→</span><span class="cur">Sortir d'un trade</span>
+  </nav>
+
+  <span class="lt-eyebrow"><span class="lt-dot"></span> Méthode forex</span>
+  <h1 class="bl-art__title">Sortir d'un trade : objectif fixe, prises partielles ou stop suiveur</h1>
+  <div class="bl-art__meta">
+    <span data-en="By the founders of Le Terminal">Par les fondateurs du Terminal</span>
+    <span>·</span>
+    <span data-en="Published September 2, 2026">Publié le 2 septembre 2026</span>
+    <span>·</span>
+    <span data-en="12 min read">12 min de lecture</span>
+  </div>
+
+  <figure class="bl-art__hero">
+    <img src="/blog/img/sortir-d-un-trade.webp" width="1600" height="900" alt="Les quatre politiques de sortie d'une position — objectif fixe, prises partielles, remontée du stop au point mort et sortie par le temps — avec ce que chacune apporte et ce qu'elle coûte" fetchpriority="high">
+  </figure>
+
+  <div class="bl-lead">
+    <p><strong>En bref.</strong> Tout ce qui a été écrit ici concernait l'entrée, le risque et la revue. Il manquait le milieu : <strong>quand sortir</strong>. Le principe qui organise tout le sujet tient en une phrase — <strong>toute règle qui réduit la variabilité des résultats réduit aussi le gain moyen</strong>. La question n'est donc pas quelle sortie est la meilleure, mais laquelle correspond à ce que vous cherchez et à ce que vous pouvez tenir.</p>
+  </div>
+
+  <div class="bl-prose">
+    <p>C'est le sujet le moins traité du trading, et probablement celui qui décide le plus. Deux personnes peuvent prendre exactement les mêmes entrées, avec exactement les mêmes stops, et obtenir des résultats radicalement différents — parce qu'elles ne sortent pas au même moment.</p>
+    <p>Cet article traite du <em>choix</em> de la règle de sortie. La mécanique des ordres correspondants — take profit, stop suiveur, OCO — figure dans notre article sur les <a href="/blog/types-ordres-trading">types d'ordres</a>.</p>
+
+    <h2>Le principe qui commande tout</h2>
+    <p>Avant les quatre règles, l'arbitrage qui les traverse toutes.</p>
+    <p>Chaque dispositif qui sécurise un gain plus tôt réduit la <strong>variabilité</strong> de vos résultats : moins de gains énormes, moins de retours à zéro, une courbe plus lisse. Et chacun réduit simultanément votre <strong>gain moyen</strong>, parce que la partie sécurisée ne participe plus aux mouvements les plus amples.</p>
+    <div class="bl-note">
+      <p><strong>Il n'y a pas de sortie « optimale » dans l'absolu.</strong> Il y a un curseur entre confort et performance. Le placer relève de deux questions : quel type de mouvement votre méthode cherche-t-elle, et quelle variabilité êtes-vous capable de tenir sans changer de méthode en cours de route ?</p>
+    </div>
+    <p>Cette seconde question n'est pas accessoire. Une règle théoriquement supérieure que vous abandonnez au troisième retour à zéro vaut moins qu'une règle médiocre que vous appliquez pendant deux ans.</p>
+
+    <h2>1. L'objectif fixe</h2>
+    <p>La position se ferme entièrement à un niveau défini avant l'entrée.</p>
+
+    <h3>Ce que ça apporte</h3>
+    <ul>
+      <li><strong>C'est mesurable.</strong> Une règle unique, sans jugement en cours de route, donc évaluable par un <a href="/blog/backtester-une-strategie">backtest</a>. Aucune des autres n'a cette qualité au même degré.</li>
+      <li><strong>Ça supprime la question « et si ça continuait ? »</strong>, qui coûte beaucoup plus qu'elle ne rapporte.</li>
+      <li><strong>Ça permet de calculer le ratio avant d'entrer</strong>, donc de refuser les opérations qui n'en valent pas la peine.</li>
+    </ul>
+
+    <h3>Ce que ça coûte</h3>
+    <p>Vous laissez partir les mouvements exceptionnels. Sur une méthode de suivi de tendance, c'est précisément là que se joue l'essentiel de la performance.</p>
+
+    <h3>Où placer l'objectif</h3>
+    <p>Sur le graphique d'abord, jamais sur un chiffre rond : la prochaine <a href="/blog/supports-et-resistances">zone technique majeure</a>, ou l'objectif mesuré d'une <a href="/blog/figures-chartistes">figure chartiste</a>. Puis on convertit en ratio. Si la distance jusqu'à cette zone ne représente pas au moins deux fois la distance de stop, l'opération ne vaut souvent pas d'être prise.</p>
+
+    <h2>2. Les prises partielles</h2>
+    <p>Une fraction de la position est fermée à un premier objectif, le reste laissé courir.</p>
+    <p>C'est la règle la plus populaire, et celle sur laquelle circulent le plus d'idées reçues. Elle mérite d'être présentée honnêtement.</p>
+
+    <h3>Ce que ça apporte</h3>
+    <p>Un confort réel. Sécuriser une partie transforme l'expérience de la position : le reste se tient beaucoup plus facilement. Et sur les méthodes à faible taux de réussite, la régularité des petits gains aide à traverser les séries perdantes sans abandonner — ce qui rejoint le palier 4 décrit dans notre article sur <a href="/blog/devenir-rentable-trading">la rentabilité</a>.</p>
+
+    <h3>Ce que ça coûte, et il faut le dire</h3>
+    <p><strong>Le gain moyen baisse.</strong> La fraction fermée tôt ne participe pas aux grands mouvements. Or dans une méthode de suivi de tendance, un petit nombre d'opérations très favorables compense l'ensemble des pertes : amputer systématiquement ces opérations-là attaque directement ce qui fait la performance.</p>
+    <p>S'y ajoutent deux effets moins visibles :</p>
+    <ul>
+      <li><strong>Les frais doublent</strong> sur l'opération, puisqu'il y a deux sorties au lieu d'une. Sur une fréquence élevée, le cumul compte, comme le montrent nos <a href="/blog/couts-du-trading">chiffres sur le coût du trading</a>.</li>
+      <li><strong>La mesure devient plus difficile.</strong> Un trade à deux sorties se résume moins bien à un seul chiffre, ce qui complique la comparaison.</li>
+    </ul>
+    <p>La prise partielle n'est donc pas une amélioration en soi : c'est un <strong>échange de performance contre du confort</strong>. Cet échange est parfaitement légitime — encore faut-il savoir qu'on le fait.</p>
+
+    <h2>3. Le stop au point mort</h2>
+    <p>Le stop est remonté au prix d'entrée une fois la position en gain. L'opération ne peut plus rien coûter.</p>
+
+    <h3>Ce que ça apporte</h3>
+    <p>La suppression du risque de perte, et le soulagement qui l'accompagne. C'est le dispositif le plus puissant psychologiquement des quatre.</p>
+
+    <h3>Ce que ça coûte</h3>
+    <p>Beaucoup plus qu'on ne le croit. Remonter le stop au point d'entrée place une protection <strong>au milieu du bruit ordinaire</strong> de l'instrument. Or les replis sont fréquents dans toute progression saine : le résultat est une multiplication des sorties à zéro, souvent juste avant que le mouvement attendu ne se produise.</p>
+    <div class="bl-note">
+      <p><strong>La règle qui rend le procédé défendable.</strong> Le déplacement du stop doit être <strong>conditionné à un événement du marché</strong> — la formation d'un nouveau creux plus haut, le franchissement d'un niveau — et jamais au simple fait d'être en gain. Un stop qu'on remonte parce qu'on est content n'est pas une règle, c'est une émotion.</p>
+    </div>
+    <p>La distance minimale à respecter se déduit de la volatilité de l'instrument, avec la méthode décrite dans <a href="/blog/mesurer-la-volatilite">mesurer la volatilité</a> : un stop situé à moins d'une unité de mouvement ordinaire sera touché par ce mouvement ordinaire.</p>
+
+    <h2>4. La sortie par le temps</h2>
+    <p>La position est fermée au bout d'une durée fixée d'avance, quel que soit le prix atteint. C'est la règle la moins employée, et probablement la plus sous-estimée.</p>
+
+    <h3>La logique</h3>
+    <p>Un scénario a une échéance implicite. Si vous attendiez une cassure dans les trois séances et qu'au bout de trois séances rien ne s'est produit, <strong>le scénario est probablement invalidé</strong> — même si le stop n'a pas été touché. Attendre davantage revient à espérer, pas à analyser.</p>
+
+    <h3>Ce que ça apporte</h3>
+    <ul>
+      <li><strong>Ça libère du capital et de l'attention</strong> pour d'autres opérations.</li>
+      <li><strong>Ça réduit l'exposition aux imprévus</strong> — publications, gaps de réouverture — sur des positions qui ne font rien.</li>
+      <li><strong>Ça évite les positions « oubliées »</strong>, conservées des semaines sans raison et qui finissent par produire les pertes les plus inattendues.</li>
+    </ul>
+    <p>Sur les marchés qui ferment, cette règle recoupe une pratique déjà évoquée : fermer avant une publication de <a href="/blog/trader-les-actions">résultats</a> ou avant le week-end sur les <a href="/blog/trader-les-indices">indices</a>, non par superstition mais parce que la perte potentielle n'y est plus bornée par le stop.</p>
+
+    <h2>Choisir selon ce que vous cherchez</h2>
+    <p>Il n'y a pas de bonne réponse générale, mais il y a des correspondances raisonnables entre le type de mouvement visé et la règle de sortie.</p>
+    <div class="bl-note">
+      <p><strong>Objectif court en range</strong> — l'objectif fixe s'impose : les mouvements amples y sont rares, il n'y a rien à laisser courir<br>
+      <strong>Suivi de tendance</strong> — un objectif fixe ampute ce qui fait la performance ; le stop suiveur est plus cohérent<br>
+      <strong>Méthode à faible taux de réussite</strong> — les partielles aident à tenir la série, au prix du gain moyen<br>
+      <strong>Positions conservées plusieurs séances</strong> — la sortie par le temps mérite d'être ajoutée aux trois autres</p>
+    </div>
+    <p>Une remarque qui vaut d'être faite : la cohérence compte plus que le choix. Alterner les règles selon l'humeur du moment produit un ensemble de trades non comparables, donc non mesurables — et une méthode non mesurable ne peut pas s'améliorer.</p>
+
+    <h2>Les erreurs de sortie</h2>
+
+    <h3>Décider en cours de route</h3>
+    <p>La plus coûteuse. Un objectif fixé après l'entrée est déterminé par le résultat courant, pas par la structure du marché : c'est une décision émotionnelle déguisée en analyse. Les règles se posent <strong>avant</strong>, comme le formalise le <a href="/blog/plan-de-trading">plan de trading</a>.</p>
+
+    <h3>Déplacer l'objectif quand le prix s'en approche</h3>
+    <p>Le pendant exact du stop qu'on éloigne quand le prix s'en rapproche — le mécanisme central de nos <a href="/blog/erreurs-psychologie-trading">erreurs de psychologie</a>. Dans les deux cas, une règle devient négociable au moment précis où elle devrait s'appliquer.</p>
+
+    <h3>Sortir sur une émotion</h3>
+    <p>Fermer parce que la position « fait peur », ou parce qu'un titre d'actualité a inquiété. Si l'invalidation n'est pas atteinte et que la durée prévue n'est pas écoulée, il ne s'est rien passé qui justifie une sortie.</p>
+
+    <h3>Empiler les règles</h3>
+    <p>Partielle, puis point mort, puis stop suiveur, puis sortie par le temps : chaque dispositif rogne un peu le gain moyen, et leur cumul finit par ne laisser presque rien. Deux règles suffisent dans la grande majorité des cas.</p>
+
+    <h2>Comment trancher sur vos propres données</h2>
+    <p>Toute cette discussion se règle par une mesure, et elle est simple à mettre en place.</p>
+    <p>Pour chaque opération, notez une donnée supplémentaire : <strong>le prix le plus favorable atteint avant votre sortie</strong>. Autrement dit, jusqu'où le trade est allé en votre faveur, indépendamment de ce que vous avez pris.</p>
+    <p>Sur quelques dizaines d'opérations, la comparaison entre ce potentiel et votre résultat réel répond directement à la question :</p>
+    <ul>
+      <li>Le prix dépasse régulièrement et largement votre objectif → <strong>vous sortez trop tôt</strong>.</li>
+      <li>Le prix atteint rarement votre objectif et revient sur votre stop → <strong>votre objectif est trop ambitieux</strong>, ou votre entrée trop tardive.</li>
+      <li>Le prix touche votre objectif sans le dépasser beaucoup → le réglage est cohérent.</li>
+    </ul>
+    <p>C'est la statistique la plus utile qu'un <a href="/blog/comment-tenir-journal-trading">journal de trading</a> puisse produire, et l'une des moins souvent tenues. Elle tranche en quelques semaines un débat que les avis extérieurs ne trancheront jamais — parce que la réponse dépend de votre méthode, de vos instruments et de vos horaires, pas d'un principe général.</p>
+  </div>
+
+  <section class="bl-cta">
+    <p class="bl-cta__t">Mesurez ce que vous laissez sur la table</p>
+    <p>Le Journal du Terminal agrège vos opérations et met votre résultat réel face à ce que le trade offrait — de quoi savoir si vous sortez trop tôt ou trop tard, au lieu d'en débattre.</p>
+    <a class="lt-btn lt-btn--primary" href="/journal-presentation">Découvrir le Journal de Trading</a>
+  </section>
+
+  <div class="bl-prose">
+    <div class="bl-note">
+      <p><strong>Avertissement risque.</strong> Ce contenu est éducatif et ne constitue pas un conseil en investissement. Aucune règle de sortie, aucun ratio et aucun réglage ne sont recommandés : les arbitrages décrits doivent être évalués sur vos propres données, et aucun ne garantit un résultat. Un stop, y compris remonté au point d'entrée, ne garantit pas une exécution au niveau prévu. Le trading comporte un risque de perte en capital pouvant dépasser le dépôt initial sur les produits à effet de levier.</p>
+    </div>
+
+    <h2>FAQ</h2>
+    <div class="bl-faq">
+      <div class="bl-faq__item">
+        <h3>Faut-il prendre des bénéfices partiels ?</h3>
+        <p>Une prise partielle réduit la variabilité des résultats et rend la série de trades plus confortable à vivre, mais elle diminue le gain moyen : la fraction fermée tôt ne participe pas aux mouvements les plus amples, qui font l'essentiel de la performance des méthodes de suivi de tendance. Ce n'est donc pas une amélioration en soi mais un arbitrage, à trancher sur ses propres relevés plutôt que sur un principe général.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Faut-il remonter son stop au point mort ?</h3>
+        <p>Remonter le stop au prix d'entrée supprime le risque de perte sur l'opération, ce qui est psychologiquement puissant. En contrepartie, cela augmente nettement le nombre de sorties à zéro : un repli parfaitement normal suffit à déclencher la sortie avant que le mouvement attendu ne se produise. Le déplacement doit donc être conditionné à un événement du marché, jamais au simple fait d'être en gain.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Quand fixer son objectif de sortie ?</h3>
+        <p>Avant d'entrer, en même temps que le niveau d'invalidation. C'est ce qui permet de calculer le rapport entre ce qui est risqué et ce qui est visé, et donc de décider si l'opération vaut d'être prise. Un objectif fixé après l'entrée est déterminé par le résultat courant et non par la structure du marché, ce qui en fait une décision émotionnelle déguisée en analyse.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Qu'est-ce qu'une sortie par le temps ?</h3>
+        <p>C'est la fermeture d'une position au bout d'une durée définie à l'avance, indépendamment du prix atteint. La logique est qu'un scénario attendu qui ne se réalise pas dans le délai prévu est probablement invalidé, même si le stop n'a pas été touché. Cette règle libère du capital et de l'attention, et réduit l'exposition aux événements imprévus sur les positions qui stagnent.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Faut-il laisser courir ses gains ?</h3>
+        <p>Cette maxime décrit une caractéristique réelle de certaines approches : dans une méthode de suivi de tendance, un petit nombre d'opérations très favorables compense de nombreuses pertes limitées. Elle n'a en revanche aucun sens dans une méthode conçue pour des objectifs courts en range, où les mouvements amples sont rares. La règle de sortie doit correspondre au type de mouvement recherché.</p>
+      </div>
+      <div class="bl-faq__item">
+        <h3>Comment savoir quelle règle de sortie me convient ?</h3>
+        <p>En la mesurant plutôt qu'en la choisissant. Il suffit de noter, pour chaque opération, le prix atteint au plus favorable avant la sortie effective. Sur plusieurs dizaines de trades, la comparaison entre ce potentiel et le résultat réellement obtenu indique si vous sortez trop tôt, trop tard, ou au bon endroit — une réponse propre à votre méthode et à vos instruments.</p>
+      </div>
+    </div>
+
+    <div class="bl-author">
+      <span class="bl-author__ava">LT</span>
+      <div>
+        <p class="bl-author__name">Les fondateurs du Terminal</p>
+        <p class="bl-author__bio">Adrien et Romain, fondateurs du Terminal, conçoivent les outils et les contenus méthodologiques de la plateforme avec un principe : aucune promesse de gain, uniquement des cadres et des outils pour décider mieux.</p>
+      </div>
+    </div>
+
+    <p class="bl-src">Sources : littérature sur l'évaluation des stratégies de marché et l'arbitrage entre espérance et variance dans les règles de sortie, 2025-2026. Aucun réglage n'est recommandé. Publié le 2 septembre 2026.</p>
+
+    <div class="bl-more">
+      <h2>Pour aller plus loin</h2>
+      <div class="bl-more__grid">
+        <a href="/blog/types-ordres-trading"><span class="t">Les types d'ordres</span><span class="d">La mécanique des sorties</span></a>
+        <a href="/blog/mesurer-la-volatilite"><span class="t">Mesurer la volatilité</span><span class="d">À quelle distance placer le stop</span></a>
+        <a href="/blog/gestion-du-risque-trading"><span class="t">Gestion du risque</span><span class="d">Le ratio se calcule avant d'entrer</span></a>
+        <a href="/blog/comment-tenir-journal-trading"><span class="t">Tenir un journal</span><span class="d">Mesurer ce que vous laissez</span></a>
+      </div>
+    </div>
+  </div>
+</article>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var fill=document.querySelector('.lt-progress__fill'), chrome=document.getElementById('ltChrome'), raf=0;
+  function onScroll(){ if(raf) return; raf=requestAnimationFrame(function(){ raf=0; var h=document.documentElement; if(fill) fill.style.width=((h.scrollTop/Math.max(1,h.scrollHeight-h.clientHeight))*100).toFixed(2)+'%'; if(chrome) chrome.classList.toggle('is-scrolled', window.scrollY>24); }); }
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+  var drop=document.getElementById('ltDrop');
+  if(drop){ var menu=drop.querySelector('.lt-nav__menu'), caret=drop.querySelector('.lt-nav__caret'), trig=drop.querySelector('.lt-nav__droptrigger');
+    function so(o){ if(menu) menu.classList.toggle('is-open',o); if(caret) caret.classList.toggle('is-open',o); if(trig) trig.setAttribute('aria-expanded',o); }
+    drop.addEventListener('mouseenter',function(){so(true);}); drop.addEventListener('mouseleave',function(){so(false);});
+  }
+  /* Bascule FR/EN gérée par lang.js (délégation globale) — pas de wiring local. */
+})();
+</script>
+<script src="/appshell.js"></script>
+<script src="/menu.js"></script>
+<footer class="lt-footer ltf">
+  <div class="ltf__wrap">
+    <div class="ltf__brand">
+      <span class="lt-nav__mark"><img src="/logo-nav.webp" alt="Le Terminal" style="width:38px;height:38px;border-radius:8px;object-fit:cover;display:block;"></span>
+      <span class="lt-nav__word">LE&nbsp;TERMINAL</span>
+    </div>
+
+    <div class="ltf__cols">
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Tools">Outils</h4>
+        <a href="/analyzer-presentation">Setup Analyzer</a>
+        <a href="/journal-presentation" data-en="Trading Journal">Journal de Trading</a>
+        <a href="/calendrier-presentation" data-en="Economic Calendar">Calendrier Éco</a>
+        <a href="/bubble">Bubble Map</a>
+        <a href="/mur-des-trades" data-en="Trade Wall">Mur des Trades</a>
+        <a href="/patrimoine-presentation" data-en="Wealth tracker">Patrimoine</a>
+        <a href="/calculateur" data-en="Pip Calculator">Calculateur de Pips</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Markets">Marchés</h4>
+        <a href="/eco-calendrier" data-en="Overview">Présentation</a>
+        <a href="/eco-flash">Flash Info</a>
+        <a href="/eco-selection" data-en="The selection">La sélection</a>
+        <a href="/eco-crypto">Crypto</a>
+        <a href="/eco-archive" data-en="Archive">Archive</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Company">Entreprise</h4>
+        <a href="/blog">Blog</a>
+        <a href="/#method" data-en="Method">Méthode</a>
+        <a href="/#community" data-en="Community">Communauté</a>
+        <a href="/avis" data-en="Reviews">Avis</a>
+        <a href="/tarifs" data-en="Pricing">Tarifs</a>
+      </div>
+      <div class="ltf__col">
+        <h4 class="ltf__h" data-en="Legal">Infos légales</h4>
+        <a href="/legal#mentions" data-en="Legal notice">Mentions légales</a>
+        <a href="/legal#confidentialite" data-en="Privacy">Confidentialité</a>
+        <a href="/legal#cookies" data-en="Cookies">Cookies</a>
+        <a href="/legal#cgv" data-en="Terms">CGV</a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <div class="ltf__mid">
+      <div class="ltf__social">
+        <a href="https://www.instagram.com/leterminalapp/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://t.me/leterminalfx" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 4.3 2.9 11.4c-.9.35-.88 1.65.03 1.97l4.6 1.6 1.77 5.3c.27.66 1.13.79 1.6.25l2.5-2.7 4.45 3.28c.6.44 1.46.12 1.62-.61L22.9 5.4c.2-.92-.7-1.46-1.4-1.1z"/><path d="m7.5 15 9-7.5-6.6 8.3"/></svg></a>
+      </div>
+    </div>
+
+    <div class="ltf__sep"></div>
+
+    <p class="ltf__disc" data-en="Le Terminal is a suite of research, analysis and decision-support tools for self-directed traders and investors. We provide no recommendation on specific assets and no investment advice. Trading carries a high risk and may not suit every profile: a total loss — or a loss exceeding the capital invested — is possible.">Le Terminal est une suite d'outils de recherche, d'analyse et d'aide à la décision destinée aux traders et investisseurs autonomes. Nous ne fournissons aucune recommandation sur des actifs spécifiques et ne dispensons aucun conseil en investissement. Le trading comporte un risque élevé et peut ne pas convenir à tous les profils : une perte totale, voire supérieure au capital investi, est possible.</p>
+
+    <div class="ltf__bottom">
+      <span data-en="© 2026 Le Terminal — AI-powered trading hub">© 2026 Le Terminal — Hub trading propulsé par l'IA</span>
+    </div>
+  </div>
+</footer>
+<script src="/cookies.js"></script>
+<script src="/lang.js"></script>
+<script src="/theme.js"></script>
+</body>
+</html>
