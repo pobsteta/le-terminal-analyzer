@@ -33,7 +33,7 @@
      font:500 14px/1 'JetBrains Mono',monospace;padding:10px 12px;outline:none;transition:border-color .3s var(--ease)}
   input:focus,select:focus{border-color:var(--accent)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+  .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
   .seg button{background:var(--elevated);border:1px solid var(--hair);border-radius:4px;color:var(--body);
      font:700 12px/1 'JetBrains Mono',monospace;letter-spacing:.08em;padding:10px 0;cursor:pointer;transition:all .3s var(--ease)}
   .seg button.on{border-color:var(--accent);color:var(--title);box-shadow:0 0 0 1px var(--accent) inset}
@@ -59,10 +59,13 @@
     <form class="panel" id="form" onsubmit="return false">
       <label>État du trade</label>
       <div class="seg" id="seg">
+        <button type="button" data-s="signal">Signal</button>
         <button type="button" data-s="tp1" class="on">TP1</button>
+        <button type="button" data-s="be">BE</button>
         <button type="button" data-s="tp2">TP2</button>
         <button type="button" data-s="tp3">TP3</button>
         <button type="button" data-s="sl">SL</button>
+        <button type="button" data-s="bes">Sortie BE</button>
       </div>
 
       <label class="check"><input type="checkbox" id="generic"> Version générique (sans chiffres)</label>
@@ -75,11 +78,19 @@
         </div>
         <div class="row">
           <div class="field"><label for="entry">Entrée</label><input id="entry" value="2 345,50" inputmode="decimal"></div>
-          <div class="field"><label for="exit">Prix de sortie</label><input id="exit" value="2 352,00" inputmode="decimal"></div>
+          <div class="field" id="f-exit"><label for="exit">Prix de sortie</label><input id="exit" value="2 352,00" inputmode="decimal"></div>
+          <div class="field" id="f-sl"><label for="slp">Stop loss</label><input id="slp" value="2 340,50" inputmode="decimal"></div>
         </div>
-        <div class="row">
-          <div class="field"><label for="pips">Pips</label><input id="pips" value="+65" maxlength="10"></div>
-          <div class="field"><label for="rr">Résultat (R)</label><input id="rr" value="+1,3 R" maxlength="10"></div>
+        <div class="row" id="f-res">
+          <div class="field"><label for="pips" id="l-pips">Pips</label><input id="pips" value="+65" maxlength="10"></div>
+          <div class="field" id="f-rr"><label for="rr">Résultat (R)</label><input id="rr" value="+1,3 R" maxlength="10"></div>
+        </div>
+        <div id="f-tps">
+          <div class="row">
+            <div class="field"><label for="tp1p">TP1</label><input id="tp1p" value="2 352,00" inputmode="decimal"></div>
+            <div class="field"><label for="tp2p">TP2</label><input id="tp2p" value="2 358,50" inputmode="decimal"></div>
+          </div>
+          <div class="field"><label for="tp3p">TP3</label><input id="tp3p" value="2 368,00" inputmode="decimal"></div>
         </div>
         <div class="field"><label for="date">Date</label><input id="date" value=""></div>
       </div>
@@ -106,23 +117,42 @@
     bull:'#4ADE9C', bear:'#F0647A', neutral:'#E8C268'
   };
   // Contenu de chaque état — vouvoiement, ton feutré.
+  // nodes : frise du trade ; lit : [premier, dernier] nœud allumé.
+  var GREEN = 'rgba(74,222,156,', RED = 'rgba(240,100,122,', GOLD = 'rgba(232,194,104,', BLUE = 'rgba(59,125,255,';
+  var TPS = ['ENTRÉE','TP1','TP2','TP3'];
   var STATES = {
-    tp1:{ big:'TP1', word:'ATTEINT', eyebrow:'OBJECTIF 1 / 3', color:C.bull, glow:'rgba(74,222,156,',
-          line1:'Premier objectif encaissé.', line2:'Stop déplacé au point d’entrée : le risque est retiré.', step:1 },
-    tp2:{ big:'TP2', word:'ATTEINT', eyebrow:'OBJECTIF 2 / 3', color:C.bull, glow:'rgba(74,222,156,',
-          line1:'Deuxième objectif encaissé.', line2:'Le plan se déroule, la position restante court.', step:2 },
-    tp3:{ big:'TP3', word:'ATTEINT', eyebrow:'OBJECTIF FINAL', color:C.bull, glow:'rgba(74,222,156,',
-          line1:'Objectif final atteint.', line2:'Trade clôturé en totalité. Plan exécuté.', step:3 },
-    sl: { big:'SL', word:'TOUCHÉ', eyebrow:'STOP LOSS', color:C.bear, glow:'rgba(240,100,122,',
-          line1:'Perte limitée, conforme au plan.', line2:'Le risque était défini avant l’entrée. Trade suivant.', step:-1 }
+    signal:{ big:'SIGNAL', word:'OUVERT', eyebrow:'NOUVEAU SIGNAL', color:C.accent, glow:BLUE,
+          line1:'Entrée, objectifs et stop définis à l\u2019avance.', line2:'Risquez 1 % maximum. Stop placé dès l\u2019entrée.',
+          nodes:['SL','ENTRÉE','TP1','TP2','TP3'], lit:[1,1], preview:true },
+    tp1:{ big:'TP1', word:'ATTEINT', eyebrow:'OBJECTIF 1 / 3', color:C.bull, glow:GREEN,
+          line1:'Premier objectif encaissé.', line2:'Stop déplacé au point d\u2019entrée : le risque est retiré.',
+          nodes:TPS, lit:[0,1], exitLabel:'SORTIE TP1' },
+    be: { big:'BE', word:'SÉCURISÉ', eyebrow:'STOP AU POINT D\u2019ENTRÉE', color:C.neutral, glow:GOLD,
+          line1:'Stop déplacé au point d\u2019entrée.', line2:'Le risque est retiré : le trade ne peut plus être perdant.',
+          nodes:['SL = ENTRÉE','TP1','TP2','TP3'], lit:[0,1] },
+    tp2:{ big:'TP2', word:'ATTEINT', eyebrow:'OBJECTIF 2 / 3', color:C.bull, glow:GREEN,
+          line1:'Deuxième objectif encaissé.', line2:'Le plan se déroule, la position restante court.',
+          nodes:TPS, lit:[0,2], exitLabel:'SORTIE TP2' },
+    tp3:{ big:'TP3', word:'ATTEINT', eyebrow:'OBJECTIF FINAL', color:C.bull, glow:GREEN,
+          line1:'Objectif final atteint.', line2:'Trade clôturé en totalité. Plan exécuté.',
+          nodes:TPS, lit:[0,3], exitLabel:'SORTIE TP3' },
+    sl: { big:'SL', word:'TOUCHÉ', eyebrow:'STOP LOSS', color:C.bear, glow:RED,
+          line1:'Perte limitée, conforme au plan.', line2:'Le risque était défini avant l\u2019entrée. Trade suivant.',
+          nodes:['ENTRÉE','SL'], lit:[0,1], exitLabel:'SORTIE SL' },
+    bes:{ big:'BE', word:'TOUCHÉ', eyebrow:'SORTIE AU POINT D\u2019ENTRÉE', color:C.neutral, glow:GOLD,
+          line1:'Sortie au point d\u2019entrée après TP1.', line2:'Gains de TP1 conservés, aucun risque pris sur le reste.',
+          nodes:['ENTRÉE','TP1','SORTIE BE'], lit:[0,2], exitLabel:'SORTIE BE', valColor:C.bull }
   };
 
   // Valeurs d'exemple par état (remplacées dès que vous modifiez un champ)
   var EXAMPLES = {
+    signal:{ exit:'', pips:'', rr:'' },
     tp1:{ exit:'2 352,00', pips:'+65', rr:'+1,3 R' },
+    be: { exit:'', pips:'+65', rr:'' },
     tp2:{ exit:'2 358,50', pips:'+130', rr:'+2,6 R' },
     tp3:{ exit:'2 368,00', pips:'+225', rr:'+4,5 R' },
-    sl: { exit:'2 340,50', pips:'\u221250', rr:'\u22121 R' }
+    sl: { exit:'2 340,50', pips:'\u221250', rr:'\u22121 R' },
+    bes:{ exit:'2 345,50', pips:'+65', rr:'+1,3 R' }
   };
   var touched = false;
 
@@ -217,8 +247,14 @@
     ctx.restore();
   }
 
-  function title(s){
+  function title(s, d, generic){
     ctx.textBaseline = 'alphabetic';
+    var big = s.big, word = s.word, bigColor = s.color, bigGlow = s.glow;
+    if (s.preview && !generic){
+      big = d.side === 'sell' ? 'VENTE' : 'ACHAT';
+      bigColor = d.side === 'sell' ? C.bear : C.bull; bigGlow = d.side === 'sell' ? RED : GREEN;
+      word = (d.asset || 'ACTIF').toUpperCase();
+    }
     // eyebrow
     ctx.fillStyle = s.color; ctx.font = '700 15px "JetBrains Mono"';
     ctx.beginPath(); ctx.arc(62, 170, 4, 0, Math.PI*2); ctx.fill();
@@ -226,13 +262,14 @@
     // TP1 (couleur d'état) + ATTEINT (métal)
     ctx.font = '400 168px Anton';
     var g = ctx.createLinearGradient(0, 200, 0, 345);
-    g.addColorStop(0, s.color); g.addColorStop(0.5, s.color); g.addColorStop(1, s.glow+'0.62)');
+    g.addColorStop(0, bigColor); g.addColorStop(0.5, bigColor); g.addColorStop(1, bigGlow+'0.62)');
     ctx.fillStyle = g;
-    ctx.fillText(s.big, 52, 345);
-    var bw = ctx.measureText(s.big).width;
+    ctx.fillText(big, 52, 345);
+    var bw = ctx.measureText(big).width, size = 92;
     ctx.font = '400 92px Anton';
-    ctx.fillStyle = metal(262, 345);
-    ctx.fillText(s.word, 52 + bw + 26, 345);
+    while (ctx.measureText(word).width > 780 - bw - 26 && size > 48){ size -= 2; ctx.font = '400 '+size+'px Anton'; }
+    ctx.fillStyle = metal(345 - size*0.9, 345);
+    ctx.fillText(word, 52 + bw + 26, 345);
     // barre bleue courte + sous-titre
     ctx.fillStyle = C.accent; ctx.fillRect(58, 378, 64, 4);
     ctx.font = '500 24px Inter'; ctx.fillStyle = C.title;
@@ -241,24 +278,32 @@
     ctx.fillText(s.line2, 56, 458);
   }
 
-  // Frise Entrée → TP1 → TP2 → TP3 (ou Entrée → SL)
+  // Frise du trade (Entrée → TP1 → TP2 → TP3, Entrée → SL…)
+  function nodeColor(name, s){
+    if (name.indexOf('ENTRÉE') === 0) return C.accent;
+    if (name === 'SL') return C.bear;
+    if (name.indexOf('TP') === 0) return C.bull;
+    return s.color;
+  }
   function ladder(s, x0, y, x1){
-    var nodes = s.step < 0 ? ['ENTRÉE','SL'] : ['ENTRÉE','TP1','TP2','TP3'];
-    var reached = s.step < 0 ? 1 : s.step;
+    var nodes = s.nodes, a = s.lit[0], b = s.lit[1];
     var n = nodes.length, gap = (x1 - x0) / (n - 1);
     ctx.lineWidth = 2;
     ctx.strokeStyle = C.hair; ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke();
-    ctx.strokeStyle = s.color; ctx.shadowColor = s.color; ctx.shadowBlur = 12;
-    ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x0 + gap*reached, y); ctx.stroke();
-    ctx.shadowBlur = 0;
+    if (b > a){
+      ctx.strokeStyle = s.color; ctx.shadowColor = s.color; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.moveTo(x0 + gap*a, y); ctx.lineTo(x0 + gap*b, y); ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
     for (var i = 0; i < n; i++){
-      var x = x0 + gap*i, on = i <= reached;
+      var x = x0 + gap*i, on = i >= a && i <= b;
+      var col = (i === 0 && !s.preview) || nodes[i].indexOf('ENTRÉE') === 0 ? C.accent : (s.preview ? nodeColor(nodes[i], s) : s.color);
       ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI*2);
       ctx.fillStyle = C.void; ctx.fill();
-      ctx.lineWidth = 1.5; ctx.strokeStyle = on ? (i === 0 ? C.accent : s.color) : C.border; ctx.stroke();
-      if (on){ ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fillStyle = i === 0 ? C.accent : s.color; ctx.fill(); }
+      ctx.lineWidth = 1.5; ctx.strokeStyle = on || s.preview ? col : C.border; ctx.stroke();
+      if (on){ ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fillStyle = col; ctx.fill(); }
       ctx.font = '700 13px "JetBrains Mono"'; ctx.textBaseline = 'alphabetic';
-      ctx.fillStyle = on ? (i === 0 ? C.bright : s.color) : C.muted;
+      ctx.fillStyle = on ? (col === C.accent ? C.bright : col) : (s.preview ? col : C.muted);
       spaced(nodes[i], x, y + 34, 2, 'center');
     }
   }
@@ -267,14 +312,15 @@
     var x = 56, y = 520, w = 1168, h = 104;
     rrect(x, y, w, h, 10); ctx.fillStyle = 'rgba(16,23,36,0.86)'; ctx.fill();
     ctx.lineWidth = 1; ctx.strokeStyle = C.hair; ctx.stroke();
+    var vc = s.valColor || s.color;
     var cells = [
       ['ACTIF', d.asset.toUpperCase(), C.title],
       ['SENS', d.side === 'sell' ? '▼ VENTE' : '▲ ACHAT', d.side === 'sell' ? C.bear : C.bull],
-      ['ENTRÉE', d.entry, C.title],
-      [s.step < 0 ? 'SORTIE SL' : 'SORTIE TP'+s.step, d.exit, C.title],
-      ['PIPS', d.pips, s.color],
-      ['RÉSULTAT', d.rr, s.color]
+      ['ENTRÉE', d.entry, C.title]
     ];
+    if (s.preview) cells = cells.concat([['TP1', d.tp1, C.bull], ['TP2', d.tp2, C.bull], ['TP3', d.tp3, C.bull], ['SL', d.sl, C.bear]]);
+    else if (state === 'be') cells = cells.concat([['NOUVEAU SL', d.entry, s.color], ['TP1 ENCAISSÉ', d.pips ? d.pips + ' pips' : '', C.bull], ['RISQUE', '0 R', s.color]]);
+    else cells = cells.concat([[s.exitLabel, d.exit, C.title], ['PIPS', d.pips, vc], ['RÉSULTAT', d.rr, vc]]);
     var cw = w / cells.length;
     for (var i = 0; i < cells.length; i++){
       var cx = x + cw*i + 28;
@@ -311,16 +357,18 @@
     var s = STATES[state];
     var generic = $('generic').checked;
     var d = { asset:val('asset'), side:$('side').value, entry:val('entry'), exit:val('exit'),
-              pips:val('pips'), rr:val('rr'), date:val('date') };
+              pips:val('pips'), rr:val('rr'), date:val('date'),
+              tp1:val('tp1p'), tp2:val('tp2p'), tp3:val('tp3p'), sl:val('slp') };
     ctx.clearRect(0,0,W,H);
     background(s);
     brandMark(s);
     header();
-    title(s);
+    title(s, d, generic);
+    var short = s.nodes.length <= 3;
     if (generic){
-      ladder(s, s.step < 0 ? 300 : 120, 560, s.step < 0 ? 980 : 1160);
+      ladder(s, short ? 300 : 120, 560, short ? 980 : 1160);
     } else {
-      ladder(s, 860, 476, s.step < 0 ? 1120 : 1180);
+      ladder(s, s.nodes[0].length > 6 ? 900 : 860, 476, short && s.nodes.length === 2 ? 1120 : 1180);
       dataPanel(s, d);
     }
     footer(d, generic);
@@ -342,6 +390,13 @@
     examples();
     [].forEach.call(document.querySelectorAll('#seg button'), function(b){ b.classList.toggle('on', b.getAttribute('data-s') === state); });
     $('data').classList.toggle('hidden', $('generic').checked);
+    var sig = state === 'signal', be = state === 'be';
+    $('f-tps').classList.toggle('hidden', !sig);
+    $('f-sl').classList.toggle('hidden', !sig);
+    $('f-res').classList.toggle('hidden', sig);
+    $('f-exit').classList.toggle('hidden', sig || be);
+    $('f-rr').classList.toggle('hidden', be);
+    $('l-pips').textContent = be ? 'Pips encaissés (TP1)' : 'Pips';
     draw();
   }
   $('seg').addEventListener('click', function(e){

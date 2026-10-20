@@ -8,19 +8,20 @@ Neuf posts, pas un de plus. Chaque post est prêt à copier-coller : remplacez l
 
 **Règles de style (charte Le Terminal)** : on vouvoie, zéro emoji (glyphes autorisés : ▲ ▼ ✓ ✕ → —), chiffres au format français (`2 345,50`), ton direct et feutré, pas de points d'exclamation.
 
-**Visuels** : `telegram/visuels/` contient les images génériques (sans chiffres) TP1, TP2, TP3 et SL, au format 1280 × 720. Pour une image avec les chiffres du trade, ouvrez `/telegram/generateur.html`, choisissez l'état, saisissez les valeurs et téléchargez le PNG. Envoyez l'image **avec** le texte en légende (une légende fait 1 024 caractères maximum, tous les posts de suivi tiennent dedans).
+**Visuels** : `telegram/visuels/` contient les images génériques (sans chiffres), au format 1280 × 720 : `signal.png`, `tp1.png`, `be.png` (stop au point d'entrée), `tp2.png`, `tp3.png`, `sl.png` et `be-sortie.png` (sortie au point d'entrée après TP1). Pour une image avec les chiffres du trade, ouvrez `/telegram/generateur.html`, choisissez l'état, saisissez les valeurs et téléchargez le PNG. Envoyez l'image **avec** le texte en légende (une légende fait 1 024 caractères maximum, tous les posts de suivi tiennent dedans).
 
 **Fil d'un trade** : publiez le signal, puis répondez au message du signal (« Répondre ») pour chaque suivi. Le fil reste lisible et chaque mise à jour renvoie au trade d'origine.
 
 | # | Post | Quand | Visuel |
 |---|---|---|---|
 | 1 | Bienvenue et règles | Une fois, épinglé | — |
-| 2 | Nouveau signal | À l'ouverture du trade | Capture du graphique (facultatif) |
+| 2 | Nouveau signal | À l'ouverture du trade | `signal.png` ou générateur (+ capture du graphique, facultatif) |
 | 3 | TP1 atteint | TP1 touché | `tp1.png` ou générateur |
-| 4 | Stop au point d'entrée | Juste après TP1 | — |
+| 4 | Stop au point d'entrée (BE) | Juste après TP1 | `be.png` ou générateur |
 | 5 | TP2 atteint | TP2 touché | `tp2.png` ou générateur |
 | 6 | TP3 atteint, trade clôturé | TP3 touché | `tp3.png` ou générateur |
 | 7 | Stop loss touché | SL touché | `sl.png` ou générateur |
+| 7 bis | Sortie au point d'entrée | Retour sur l'entrée après TP1 | `be-sortie.png` ou générateur |
 | 8 | Les outils du Terminal | 1 fois par semaine maximum | Capture d'un outil (facultatif) |
 | 9 | Nouvel article du blog | À chaque article | Bannière de l'article |
 
@@ -61,7 +62,7 @@ __Le trading comporte un risque de perte en capital. Les signaux publiés ici so
 
 ## 2. Nouveau signal
 
-Joignez une capture du graphique si vous en avez une ; sinon, envoyez le texte seul.
+Visuel : `signal.png` (ou générateur, état Signal : sens, actif, entrée, TP1, TP2, TP3 et SL sur l'image). Vous pouvez ajouter une capture du graphique en second média.
 
 ```
 **NOUVEAU SIGNAL — [XAUUSD]**
@@ -101,7 +102,7 @@ Stop déplacé au point d'entrée : le risque est retiré du trade. La suite se 
 
 ## 4. Stop au point d'entrée
 
-Sans visuel. En réponse au signal, juste après TP1.
+Visuel : `be.png` (ou générateur, état BE). En réponse au signal, juste après TP1.
 
 ```
 **STOP AU POINT D'ENTRÉE — [XAUUSD]**
@@ -158,7 +159,7 @@ Perte limitée, conforme au plan : le risque était défini avant l'entrée. Une
 On passe au trade suivant.
 ```
 
-> Si TP1 avait déjà été atteint et le stop déplacé au point d'entrée, publiez plutôt :
+> Si TP1 avait déjà été atteint et le stop déplacé au point d'entrée, publiez plutôt ce post, avec le visuel `be-sortie.png` (ou générateur, état Sortie BE) :
 >
 > ```
 > **SORTIE AU POINT D'ENTRÉE — [XAUUSD]**
